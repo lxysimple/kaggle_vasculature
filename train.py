@@ -132,8 +132,7 @@ def set_seed(seed = 42):
     
     # Set a fixed value for the hash seed
     os.environ['PYTHONHASHSEED'] = str(seed)
-    
-set_seed(CFG.seed)
+
 ############################################################################################################
 
 def load_img(path):
@@ -182,39 +181,6 @@ class BuildDataset(torch.utils.data.Dataset):
             return torch.tensor(img), torch.tensor(np.array([orig_size[0], orig_size[1]]))
 
 
-train_groups = CFG.train_groups
-valid_groups = CFG.valid_groups
-
-gt_df = pd.read_csv(CFG.gt_df)
-
-gt_df["img_path"] = gt_df["img_path"].apply(lambda x: os.path.join(CFG.data_root, x))
-gt_df["msk_path"] = gt_df["msk_path"].apply(lambda x: os.path.join(CFG.data_root, x))
-
-train_df = gt_df.query("group in @train_groups").reset_index(drop=True)
-valid_df = gt_df.query("group in @valid_groups").reset_index(drop=True)
-
-
-train_img_path = train_df["img_path"].values.tolist()
-train_msk_path = train_df["msk_path"].values.tolist()
-valid_img_path = valid_df["img_path"].values.tolist()
-valid_msk_path = valid_df["msk_path"].values.tolist()
-
-
-if CFG.debug:
-    train_img_path = train_img_path[:CFG.train_bs*5]
-    train_msk_path = train_msk_path[:CFG.train_bs*5]
-    valid_img_path = valid_img_path[:CFG.valid_bs*3]
-    valid_msk_path = valid_msk_path[:CFG.valid_bs*3]
-
-train_dataset = BuildDataset(train_img_path, train_msk_path, transforms=CFG.data_transforms['train'])
-valid_dataset = BuildDataset(valid_img_path, valid_msk_path, transforms=CFG.data_transforms['valid'])
-
-
-# The dataloader will be smaller because of batchsize.
-# num_workers=0, just to use the 0 cpu kernel.
-train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=0, shuffle=True, pin_memory=True, drop_last=False)
-valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=0, shuffle=False, pin_memory=True)
-
 ############################################################################################################
 
 def build_model(backbone, num_classes, device):
@@ -228,8 +194,6 @@ def build_model(backbone, num_classes, device):
     )
     model.to(device)
     return model
-
-model = build_model(CFG.backbone, CFG.num_classes, CFG.device)
 
 ############################################################################################################
 
@@ -283,11 +247,6 @@ def fetch_scheduler(optimizer):
         return None
         
     return scheduler
-
-
-optimizer = optim.Adam(model.parameters(), lr=CFG.lr, weight_decay=CFG.wd)
-scheduler = fetch_scheduler(optimizer)    
-
 
 ############################################################################################################
 
@@ -445,35 +404,69 @@ def run_training(model, optimizer, scheduler, device, num_epochs, train_loader, 
 
 ############################################################################################################
 
-"""
-Epoch 1/15 Valid Dice: 0.3731 | Valid Jaccard: 0.2747, the beigin 
-Epoch 1/15 Valid Dice: 0.4765 | Valid Jaccard: 0.3853, efficientnet-b1->se_resnext50_32x4d
-
-"""
-
-historys = []
-
-model, history = run_training(  
-                                model, 
-                                optimizer, 
-                                scheduler,
-                                device=CFG.device,
-                                num_epochs=CFG.epochs,
-                                train_loader=train_loader, 
-                                valid_loader=valid_loader,
-                             )
-historys.append(history)
+if __name__=='__main__':
+    set_seed(CFG.seed)
 
 
+    train_groups = CFG.train_groups
+    valid_groups = CFG.valid_groups
+
+    gt_df = pd.read_csv(CFG.gt_df)
+
+    gt_df["img_path"] = gt_df["img_path"].apply(lambda x: os.path.join(CFG.data_root, x))
+    gt_df["msk_path"] = gt_df["msk_path"].apply(lambda x: os.path.join(CFG.data_root, x))
+
+    train_df = gt_df.query("group in @train_groups").reset_index(drop=True)
+    valid_df = gt_df.query("group in @valid_groups").reset_index(drop=True)
 
 
+    train_img_path = train_df["img_path"].values.tolist()
+    train_msk_path = train_df["msk_path"].values.tolist()
+    valid_img_path = valid_df["img_path"].values.tolist()
+    valid_msk_path = valid_df["msk_path"].values.tolist()
 
 
+    if CFG.debug:
+        train_img_path = train_img_path[:CFG.train_bs*5]
+        train_msk_path = train_msk_path[:CFG.train_bs*5]
+        valid_img_path = valid_img_path[:CFG.valid_bs*3]
+        valid_msk_path = valid_msk_path[:CFG.valid_bs*3]
+
+    train_dataset = BuildDataset(train_img_path, train_msk_path, transforms=CFG.data_transforms['train'])
+    valid_dataset = BuildDataset(valid_img_path, valid_msk_path, transforms=CFG.data_transforms['valid'])
 
 
+    # The dataloader will be smaller because of batchsize.
+    # num_workers=0, just to use the 0 cpu kernel.
+    train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=0, shuffle=True, pin_memory=True, drop_last=False)
+    valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=0, shuffle=False, pin_memory=True)
 
 
+    model = build_model(CFG.backbone, CFG.num_classes, CFG.device)
 
+
+    optimizer = optim.Adam(model.parameters(), lr=CFG.lr, weight_decay=CFG.wd)
+    scheduler = fetch_scheduler(optimizer)   
+
+
+    """
+    Epoch 1/15 Valid Dice: 0.3731 | Valid Jaccard: 0.2747, the beigin 
+    Epoch 1/15 Valid Dice: 0.4765 | Valid Jaccard: 0.3853, efficientnet-b1->se_resnext50_32x4d
+
+    """
+
+    historys = []
+
+    model, history = run_training(  
+                                    model, 
+                                    optimizer, 
+                                    scheduler,
+                                    device=CFG.device,
+                                    num_epochs=CFG.epochs,
+                                    train_loader=train_loader, 
+                                    valid_loader=valid_loader,
+                                )
+    historys.append(history)
 
 
 
