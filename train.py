@@ -446,9 +446,9 @@ if __name__=='__main__':
     # train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=0, shuffle=True, pin_memory=True, drop_last=False)
     # valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=0, shuffle=False, pin_memory=True)
     
-    # Use GPUs
-    train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=2, shuffle=True, pin_memory=True, drop_last=False)
-    valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=2, shuffle=False, pin_memory=True)
+    # Use 8 GPUs
+    train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=4, shuffle=True, pin_memory=True, drop_last=False)
+    valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=4, shuffle=False, pin_memory=True)
 
 
     model = build_model(CFG.backbone, CFG.num_classes, CFG.device)
