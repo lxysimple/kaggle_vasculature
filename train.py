@@ -391,9 +391,9 @@ def run_training(model, optimizer, scheduler, device, num_epochs, train_loader, 
             torch.save(model.state_dict(), PATH)
             print(f"Model Saved{sr_}")
             
-        last_model_wts = copy.deepcopy(model.state_dict())
-        PATH = PATH = f"./{CFG.backbone}_epoch{epoch}_traloss{train_loss:.2f}_valoss{val_loss:.2f}_val_score{sum(val_scores)/len(val_scores):.2f}_last.pt"
-        torch.save(model.state_dict(), PATH)
+        # last_model_wts = copy.deepcopy(model.state_dict())
+        # PATH = PATH = f"./{CFG.backbone}_epoch{epoch}_traloss{train_loss:.2f}_valoss{val_loss:.2f}_val_score{sum(val_scores)/len(val_scores):.2f}_last.pt"
+        # torch.save(model.state_dict(), PATH)
             
         print(); print()
     
