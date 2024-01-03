@@ -102,9 +102,9 @@ class CFG:
             A.ShiftScaleRotate()    
         ], p=1.0),
         
-        "valid": A.Compose([
-            A.Resize(*img_size, interpolation=cv2.INTER_NEAREST),
-        ], p=1.0),
+        # "valid": A.Compose([
+        #     A.Resize(*img_size, interpolation=cv2.INTER_NEAREST),
+        # ], p=1.0),
         
         "valid": A.Compose([
             T.ToPILImage(),
