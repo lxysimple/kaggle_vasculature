@@ -20,6 +20,8 @@ import torch.optim as optim
 import albumentations as A
 import segmentation_models_pytorch as smp
 import torch.nn.functional as F 
+import torchvision.transforms as T
+
 
 from colorama import Fore, Back, Style
 c_  = Fore.GREEN
@@ -105,10 +107,10 @@ class CFG:
         ], p=1.0),
         
         "valid": A.Compose([
-            A.ToPILImage(),
-            A.Resize(*img_size),
-            A.ToTensor(),
-            A.Normalize([0.625, 0.448, 0.688],
+            T.ToPILImage(),
+            T.Resize(*img_size),
+            T.ToTensor(),
+            T.Normalize([0.625, 0.448, 0.688],
                         [0.131, 0.177, 0.101]),
         ]),
         
