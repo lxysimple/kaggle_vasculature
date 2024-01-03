@@ -104,11 +104,11 @@ class CFG:
             A.Resize(*img_size, interpolation=cv2.INTER_NEAREST),
         ], p=1.0),
         
-        "valid": T.Compose([
-            T.ToPILImage(),
-            T.Resize(*img_size),
-            T.ToTensor(),
-            T.Normalize([0.625, 0.448, 0.688],
+        "valid": A.Compose([
+            A.ToPILImage(),
+            A.Resize(*img_size),
+            A.ToTensor(),
+            A.Normalize([0.625, 0.448, 0.688],
                         [0.131, 0.177, 0.101]),
         ]),
         
