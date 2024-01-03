@@ -443,8 +443,12 @@ if __name__=='__main__':
 
     # The dataloader will be smaller because of batchsize.
     # num_workers=0, just to use the 0 cpu kernel.
-    train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=0, shuffle=True, pin_memory=True, drop_last=False)
-    valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=0, shuffle=False, pin_memory=True)
+    # train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=0, shuffle=True, pin_memory=True, drop_last=False)
+    # valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=0, shuffle=False, pin_memory=True)
+    
+    # Use GPUs
+    train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs, num_workers=2, shuffle=True, pin_memory=True, drop_last=False)
+    valid_loader = DataLoader(valid_dataset, batch_size=CFG.valid_bs, num_workers=2, shuffle=False, pin_memory=True)
 
 
     model = build_model(CFG.backbone, CFG.num_classes, CFG.device)
