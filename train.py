@@ -68,7 +68,7 @@ class CFG:
     # gt_df = "/kaggle/input/sennet-hoa-gt-data/gt.csv"
     # data_root = "/kaggle/input"
     # Linux
-    gt_df = "/home/xyli/kaggle/gt.csv"
+    gt_df = "/home/xyli/kaggle/blood-vessel-segmentation/gt.csv"
     data_root = "/home/xyli/kaggle"
 
     train_groups = ["kidney_1_dense", "kidney_1_voi", "kidney_2", "kidney_3_sparse"]
