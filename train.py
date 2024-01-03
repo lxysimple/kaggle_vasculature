@@ -45,7 +45,8 @@ class CFG:
     
     train_bs      = 16
     valid_bs      = 32
-    img_size      = [512, 512]
+    # img_size      = [512, 512]
+    img_size      = [1024, 1024]
     
     epochs        = 40
     
@@ -387,7 +388,7 @@ def run_training(model, optimizer, scheduler, device, num_epochs, train_loader, 
             best_epoch   = epoch
             best_model_wts = copy.deepcopy(model.state_dict())
             
-            PATH = f"./{CFG.backbone}_epoch{epoch}_traloss{train_loss:.2f}_valoss{val_loss:.2f}_val_score{sum(val_scores)/len(val_scores):.2f}_best.pt"
+            PATH = f"./{CFG.backbone}_epoch{epoch}_traloss{train_loss:.2f}_valoss{val_loss:.2f}_val_score{val_dice:.2f}_best.pt"
             torch.save(model.state_dict(), PATH)
             print(f"Model Saved{sr_}")
             
