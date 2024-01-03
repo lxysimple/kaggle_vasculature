@@ -31,8 +31,8 @@ class CFG:
     inference     = False
     seed          = 42 
     
-    debug         = True
-    # debug         = False # a bit of data for training when it=Ture
+    # debug         = True
+    debug         = False # a bit of data for training when it=Ture
 
     
     exp_name      = 'baseline'
