@@ -102,17 +102,17 @@ class CFG:
             A.ShiftScaleRotate()    
         ], p=1.0),
         
-        # "valid": A.Compose([
-        #     A.Resize(*img_size, interpolation=cv2.INTER_NEAREST),
-        # ], p=1.0),
-        
         "valid": A.Compose([
-            T.ToPILImage(),
-            T.Resize(*img_size),
-            T.ToTensor(),
-            T.Normalize([0.625, 0.448, 0.688],
-                        [0.131, 0.177, 0.101]),
-        ]),
+            A.Resize(*img_size, interpolation=cv2.INTER_NEAREST),
+        ], p=1.0),
+        
+        # "valid": A.Compose([
+        #     T.ToPILImage(),
+        #     T.Resize(*img_size),
+        #     T.ToTensor(),
+        #     T.Normalize([0.625, 0.448, 0.688],
+        #                 [0.131, 0.177, 0.101]),
+        # ]),
         
     }
 
