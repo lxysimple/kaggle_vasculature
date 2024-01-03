@@ -194,6 +194,9 @@ def build_model(backbone, num_classes, device):
         classes=num_classes,        # model output channels (number of classes in your dataset)
         activation=None,
     )
+    # GPUs On Server
+    model = nn.DataParallel(model) 
+
     model.to(device)
     return model
 
@@ -445,6 +448,7 @@ if __name__=='__main__':
 
 
     model = build_model(CFG.backbone, CFG.num_classes, CFG.device)
+
 
 
     optimizer = optim.Adam(model.parameters(), lr=CFG.lr, weight_decay=CFG.wd)
