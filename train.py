@@ -41,8 +41,8 @@ class CFG:
     in_chans = 5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
-    image_size = 912 # 512/1024  # 图片大小
-    input_size = 912 # 512/1024   # 输入尺寸
+    image_size = 911 # 512/1024  # 图片大小
+    input_size = 911 # 512/1024   # 输入尺寸
 
     train_batch_size = 16  # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
