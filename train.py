@@ -106,7 +106,8 @@ def build_model(weight="imagenet"):
     # 构建并返回模型
     # model = CustomModel(CFG, weight)
     model = CustomModel(CFG, None)
-    model.load_state_dict(tc.load(local_weights_path)) # 加载本地权重文件
+    
+    model.encoder_weights.load_state_dict(tc.load(local_weights_path)) # 加载本地权重文件
 
     return model.cuda()
 
