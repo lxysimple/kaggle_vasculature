@@ -60,8 +60,9 @@ class CFG:
                 f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_dense",
                 # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_voi",
                 # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_2",
+                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse",
+
                 # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense",
-                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
             ]
 
     # ============== 折数 =============
