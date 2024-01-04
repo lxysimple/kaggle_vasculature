@@ -507,15 +507,14 @@ if __name__=='__main__':
     optimizer = tc.optim.AdamW(model.parameters(), lr=CFG.lr)
 
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
-    # Don't work on NVIDIA GeForce GTX TITAN X
-    # scaler = tc.cuda.amp.GradScaler()
+    scaler = tc.cuda.amp.GradScaler()
 
     # 设置学习率调度器，使用OneCycleLR策略
     scheduler = tc.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=CFG.lr,
                                                 steps_per_epoch=len(train_dataset), epochs=CFG.epochs+1,
                                                 pct_start=0.1)
 
-    print("start the train!")
+   
     # 循环训练模型
     for epoch in range(CFG.epochs):
         model.train()
@@ -528,6 +527,8 @@ if __name__=='__main__':
         
         # 遍历训练数据集
         for i, (x, y) in enumerate(train_dataset):
+            print("start the train!")
+            
             x = x.cuda().to(tc.float32)
             y = y.cuda().to(tc.float32)
             
@@ -544,6 +545,7 @@ if __name__=='__main__':
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
+
             optimizer.zero_grad()
             scheduler.step()
             
