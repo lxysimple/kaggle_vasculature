@@ -97,14 +97,17 @@ def build_model(weight="imagenet"):
     # # 加载环境变量
     # load_dotenv()
 
-    weight = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth'
+    local_weights_path = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth'
     
     # 输出模型名称和使用的骨干网络
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
     # 构建并返回模型
-    model = CustomModel(CFG, weight)
+    # model = CustomModel(CFG, weight)
+    model = CustomModel(CFG, None)
+    model.encoder.load_state_dict(torch.load(local_weights_path)) # 加载本地权重文件
+    
     return model.cuda()
 
 
