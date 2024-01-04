@@ -53,8 +53,16 @@ class CFG:
     lr = 6e-5  # 学习率
     chopping_percentile = 1e-3  # 切割百分比
 
-    # data_root = '/home/xyli/kaggle/'
-    data_root = '/root/autodl-tmp/'
+    data_root = '/home/xyli/kaggle/'
+    # data_root = '/root/autodl-tmp/'
+
+    paths = [
+                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_dense",
+                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_voi",
+                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_2",
+                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense",
+                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
+            ]
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
@@ -400,19 +408,9 @@ if __name__=='__main__':
 
     train_x = [] # train_x=[[all pic of kidney_1_dense], [all pic of kidney_1_voi]...]
     train_y = []
-
-    # 数据集根路径
-    # root_path = "/root/autodl-tmp/blood-vessel-segmentation/"
-    root_path = "/home/xyli/kaggle/blood-vessel-segmentation/"
     
     # 数据集中子路径
-    paths = [
-                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_dense",
-                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_voi",
-                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_2",
-                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense",
-                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
-            ]
+    paths = CFG.paths 
 
     # 遍历子路径
     for i, path in enumerate(paths):
