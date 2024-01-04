@@ -41,8 +41,8 @@ class CFG:
     in_chans = 5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
-    image_size = 1024 # 512/1024  # 图片大小
-    input_size = 1024 # 512/1024   # 输入尺寸
+    image_size = 912 # 512/1024  # 图片大小
+    input_size = 912 # 512/1024   # 输入尺寸
 
     train_batch_size = 16  # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
@@ -51,6 +51,10 @@ class CFG:
     
     lr = 6e-5  # 学习率
     chopping_percentile = 1e-3  # 切割百分比
+
+    # data_root = '/home/xyli/kaggle/'
+    data_root = '/root/autodl-tmp/'
+
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
 
@@ -106,10 +110,6 @@ def build_model(weight="imagenet"):
 
     # 构建并返回模型
     model = CustomModel(CFG, weight)
-    # model = CustomModel(CFG, None)
-    
-    # note that: model.encoder_weights or not model
-    # model.encoder_weights.load_state_dict(tc.load(local_weights_path)) # 加载本地权重文件
 
     return model.cuda()
 
@@ -355,32 +355,21 @@ class Kaggld_Dataset(Dataset):
         y = self.y[i]
 
 
-        # my code
-        if x.shape[1] < self.image_size:
-            gap = self.image_size - x.shape[1]
-            # 按照 (left, right, top, bottom) 的顺序表示在四个方向上的填充大小
-            padding_size = (0, 0, 0, gap+1) # 底部填充0
-            x = F.pad(x, padding_size)
-            y = F.pad(y, padding_size)
-
-        if x.shape[2] < self.image_size:
-            gap = self.image_size - x.shape[2]
-            # 按照 (left, right, top, bottom) 的顺序表示在四个方向上的填充大小
-            padding_size = (0, gap+1, 0, 0) # 填充右边0
-            x = F.pad(x, padding_size)
-            y = F.pad(y, padding_size)
-            
         # # my code
-        # if x.shape[1] < self.image_size or x.shape[2] < self.image_size:
-        #     x = x[index:index + self.in_chans, :, :]
-        #     y = y[index + self.in_chans // 2, :, :]
-        # else:
-        #     x_index = np.random.randint(0, x.shape[1] - self.image_size)
-        #     y_index = np.random.randint(0, x.shape[2] - self.image_size)
+        # if x.shape[1] < self.image_size:
+        #     gap = self.image_size - x.shape[1]
+        #     # 按照 (left, right, top, bottom) 的顺序表示在四个方向上的填充大小
+        #     padding_size = (0, 0, 0, gap+1) # 底部填充0
+        #     x = F.pad(x, padding_size)
+        #     y = F.pad(y, padding_size)
 
-        #     x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-        #     y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-
+        # if x.shape[2] < self.image_size:
+        #     gap = self.image_size - x.shape[2]
+        #     # 按照 (left, right, top, bottom) 的顺序表示在四个方向上的填充大小
+        #     padding_size = (0, gap+1, 0, 0) # 填充右边0
+        #     x = F.pad(x, padding_size)
+        #     y = F.pad(y, padding_size)
+            
 
         x_index = np.random.randint(0, x.shape[1] - self.image_size)
         y_index = np.random.randint(0, x.shape[2] - self.image_size)
@@ -417,25 +406,17 @@ if __name__=='__main__':
     
     # 数据集中子路径
     paths = [
-                # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_1_dense",
-                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_1_voi",
-                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_2",
-                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense",
-                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
-
-                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_1_dense",
-                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_1_voi",
-                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_2",
-                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense",
-                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_sparse"
-
+                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_dense",
+                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_1_voi",
+                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_2",
+                # f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense",
+                f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
             ]
 
     # 遍历子路径
     for i, path in enumerate(paths):
         # 排除特定路径
-        # if path == "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense":
-        if path == "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense":    
+        if path == f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense":    
             continue
         
         # 加载图像数据（非标签）
@@ -459,11 +440,8 @@ if __name__=='__main__':
         train_y.append(y.permute(2, 0, 1))
 
     # 验证集路径
-    # path1 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
-    # path2 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense"
-
-    path1 = "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_sparse"
-    path2 = "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense"
+    path1 = f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
+    path2 = f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense"
 
     # 获取验证集图像和标签路径列表
     paths_y = glob(f"{path2}/labels/*")
