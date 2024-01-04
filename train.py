@@ -453,7 +453,7 @@ if __name__=='__main__':
     # 验证集路径
     # path1 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
     # path2 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense"
-ong
+
     path1 = "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_sparse"
     path2 = "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense"
 
