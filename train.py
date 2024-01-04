@@ -514,7 +514,7 @@ if __name__=='__main__':
                                                 steps_per_epoch=len(train_dataset), epochs=CFG.epochs+1,
                                                 pct_start=0.1)
 
-   
+    print("start the train!")
     # 循环训练模型
     for epoch in range(CFG.epochs):
         model.train()
@@ -527,8 +527,8 @@ if __name__=='__main__':
         
         # 遍历训练数据集
         for i, (x, y) in enumerate(train_dataset):
-            print("start the train!")
             
+
             x = x.cuda().to(tc.float32)
             y = y.cuda().to(tc.float32)
             
