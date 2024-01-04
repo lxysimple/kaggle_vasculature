@@ -404,20 +404,30 @@ if __name__=='__main__':
     train_y = []
 
     # 数据集根路径
-    root_path = "/root/autodl-tmp/blood-vessel-segmentation/"
+    # root_path = "/root/autodl-tmp/blood-vessel-segmentation/"
+    root_path = "/home/xyli/kaggle/blood-vessel-segmentation/"
+    
     # 数据集中子路径
     paths = [
-                "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_1_dense",
-                # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_1_voi",
-                # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_2",
-                # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense",
-                # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
+                # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_1_dense",
+                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_1_voi",
+                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_2",
+                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense",
+                # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
+
+                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_1_dense",
+                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_1_voi",
+                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_2",
+                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense",
+                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_sparse"
+
             ]
 
     # 遍历子路径
     for i, path in enumerate(paths):
         # 排除特定路径
-        if path == "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense":
+        # if path == "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense":
+        if path == "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense":    
             continue
         
         # 加载图像数据（非标签）
@@ -441,8 +451,12 @@ if __name__=='__main__':
         train_y.append(y.permute(2, 0, 1))
 
     # 验证集路径
-    path1 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
-    path2 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense"
+    # path1 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
+    # path2 = "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_dense"
+ong
+    path1 = "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_sparse"
+    path2 = "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense"
+
     # 获取验证集图像和标签路径列表
     paths_y = glob(f"{path2}/labels/*")
     paths_x = [x.replace("labels", "images").replace("dense", "sparse") for x in paths_y]
