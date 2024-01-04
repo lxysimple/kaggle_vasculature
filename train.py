@@ -93,21 +93,23 @@ class CustomModel(nn.Module):
         # output = output.squeeze(-1)
         return output[:, 0]  # 选择输出的第一个通道，这里假设输出是多通道的sigmoid()
 
+# mv /home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth /home/xyli/.cache/torch/hub/checkpoints/
 def build_model(weight="imagenet"):
     # # 加载环境变量
     # load_dotenv()
 
-    local_weights_path = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth'
+    # local_weights_path = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth'
     
     # 输出模型名称和使用的骨干网络
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
     # 构建并返回模型
-    # model = CustomModel(CFG, weight)
-    model = CustomModel(CFG, None)
+    model = CustomModel(CFG, weight)
+    # model = CustomModel(CFG, None)
     
-    model.encoder_weights.load_state_dict(tc.load(local_weights_path)) # 加载本地权重文件
+    # note that: model.encoder_weights or not model
+    # model.encoder_weights.load_state_dict(tc.load(local_weights_path)) # 加载本地权重文件
 
     return model.cuda()
 
