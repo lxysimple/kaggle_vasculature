@@ -47,7 +47,7 @@ class CFG:
     train_batch_size = 16  # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
 
-    epochs = 20 # 20/40  # 训练轮数
+    epochs = 40 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
     chopping_percentile = 1e-3  # 切割百分比
@@ -424,10 +424,10 @@ if __name__=='__main__':
                 # # "/root/autodl-tmp/blood-vessel-segmentation/train/kidney_3_sparse"
 
                 "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_1_dense",
-                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_1_voi",
-                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_2",
+                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_1_voi",
+                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_2",
                 # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_dense",
-                # "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_sparse"
+                "/home/xyli/kaggle/blood-vessel-segmentation/train/kidney_3_sparse"
 
             ]
 
@@ -487,12 +487,14 @@ if __name__=='__main__':
     # 创建训练数据集对象，使用Kaggld_Dataset类，传入训练数据和标签，arg=True表示进行一些额外的操作
     train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
     # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
-    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=2, shuffle=True, pin_memory=True)
+    # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=2, shuffle=True, pin_memory=True)
+    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=4, shuffle=True, pin_memory=True)
 
     # 创建验证数据集对象，使用Kaggld_Dataset类，传入验证数据和标签
     val_dataset = Kaggld_Dataset([val_x], [val_y])
     # 创建验证数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
-    val_dataset = DataLoader(val_dataset, batch_size=CFG.valid_batch_size, num_workers=2, shuffle=False, pin_memory=True)
+    # val_dataset = DataLoader(val_dataset, batch_size=CFG.valid_batch_size, num_workers=2, shuffle=False, pin_memory=True)
+    val_dataset = DataLoader(val_dataset, batch_size=CFG.valid_batch_size, num_workers=4, shuffle=False, pin_memory=True)
 
     # 构建模型
     model = build_model()
@@ -505,7 +507,8 @@ if __name__=='__main__':
     optimizer = tc.optim.AdamW(model.parameters(), lr=CFG.lr)
 
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
-    scaler = tc.cuda.amp.GradScaler()
+    # Don't work on NVIDIA GeForce GTX TITAN X
+    # scaler = tc.cuda.amp.GradScaler()
 
     # 设置学习率调度器，使用OneCycleLR策略
     scheduler = tc.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=CFG.lr,
