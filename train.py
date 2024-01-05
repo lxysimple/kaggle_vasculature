@@ -429,6 +429,14 @@ class Kaggld_Dataset(Dataset):
 
 if __name__=='__main__':
 
+    # =============== optimize GPUs =============== 
+
+    # 启用cudnn加速，并进行基准测试
+    tc.backends.cudnn.enabled = True
+    tc.backends.cudnn.benchmark = True
+
+    # =============== optimize GPUs =============== 
+
     # =============== data path ===============
 
     train_x = [] # train_x=[[all pic of kidney_1_dense], [all pic of kidney_1_voi], ...]
@@ -462,6 +470,7 @@ if __name__=='__main__':
         train_y.append(y.permute(1, 2, 0))
         train_x.append(x.permute(2, 0, 1))
         train_y.append(y.permute(2, 0, 1))
+    
 
     # 验证集路径
     path1 = f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
@@ -473,21 +482,18 @@ if __name__=='__main__':
 
     # =============== data path ===============
 
+    # =============== load the data ===============
+
     # 加载验证集图像和标签数据
     val_x = load_data(paths_x, is_label=False)
     print("validate dataset x shape:", val_x.shape)
     val_y = load_data(paths_y, is_label=True)
     print("validate dataset y shape:", val_y.shape)	
 
+    # =============== load the data ===============
 
-
-
-    ########################################################################################
-
-    # 启用cudnn加速，并进行基准测试
-    tc.backends.cudnn.enabled = True
-    tc.backends.cudnn.benchmark = True
-        
+    # =============== define objects ===============
+    
     # 创建训练数据集对象，使用Kaggld_Dataset类，传入训练数据和标签，arg=True表示进行一些额外的操作
     train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
     # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
@@ -522,6 +528,10 @@ if __name__=='__main__':
         pct_start=0.1
     )
 
+    # =============== define objects ===============
+
+    # =============== start the train ===============
+
     print("start the train!")
     # 循环训练模型
     for epoch in range(CFG.epochs):
@@ -532,10 +542,7 @@ if __name__=='__main__':
         
         losss = 0
         scores = 0
-        
-        # 遍历训练数据集
         for i, (x, y) in enumerate(train_dataset):
-            
 
             x = x.cuda().to(tc.float32)
             y = y.cuda().to(tc.float32)
@@ -583,8 +590,6 @@ if __name__=='__main__':
         val_losss = 0
         val_scores = 0
         best_score = 0
-        
-        # 遍历验证数据集
         for i, (x, y) in enumerate(val_dataset):
             x = x.cuda().to(tc.float32)
             y = y.cuda().to(tc.float32)
@@ -620,3 +625,5 @@ if __name__=='__main__':
     
     # # 关闭最后一个进度条
     # time.close()
+            
+    # =============== start the train ===============
