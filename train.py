@@ -90,10 +90,10 @@ class CFG:
     ]
     valid_aug = A.Compose(valid_aug_list)
 
-############################### global configure ###############################
+# ============================ global configure ============================
 
-
-########################################################################################
+# ============================ the model ============================
+    
 class CustomModel(nn.Module):
     def __init__(self, CFG, weight=None):
         super().__init__()
@@ -130,8 +130,9 @@ def build_model(weight="imagenet"):
 
     return model.cuda()
 
+# ============================ the model ============================
 
-########################################################################################
+
 
 def min_max_normalization(x: tc.Tensor) -> tc.Tensor:
     """最小-最大归一化函数
@@ -410,14 +411,15 @@ class Kaggld_Dataset(Dataset):
                         y = y.flip(dims=(i - 1,))
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
-########################################################################################
+# ============================ the main ============================
 
 if __name__=='__main__':
 
-    train_x = [] # train_x=[[all pic of kidney_1_dense], [all pic of kidney_1_voi]...]
+    # =============== data path ===============
+
+    train_x = [] # train_x=[[all pic of kidney_1_dense], [all pic of kidney_1_voi], ...]
     train_y = []
     
-    # 数据集中子路径
     paths = CFG.paths 
 
     # 遍历子路径
@@ -453,6 +455,8 @@ if __name__=='__main__':
     # 获取验证集图像和标签路径列表
     paths_y = glob(f"{path2}/labels/*")
     paths_x = [x.replace("labels", "images").replace("dense", "sparse") for x in paths_y]
+
+    # =============== data path ===============
 
     # 加载验证集图像和标签数据
     val_x = load_data(paths_x, is_label=False)
