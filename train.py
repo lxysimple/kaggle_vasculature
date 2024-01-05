@@ -255,14 +255,14 @@ class Data_loader(Dataset):
 def load_data(paths, is_label=False):
     # 创建Dataset对象，处理数据路径和是否为标签的标志
     data_loader = Data_loader(paths, is_label)
-    # 创建DataLoader，设置批量大小为16，使用2个工作进程加载数据
+    # 创建DataLoader对象，设置批量大小为16，使用2个工作进程加载数据
     data_loader = DataLoader(data_loader, batch_size=16, num_workers=2)
     # 存储数据的列表
     data = []
     # 遍历数据加载器，将每个批次的数据添加到列表中
     # for x in tqdm(data_loader):
     #     data.append(x)
-    for x in data_loader:
+    for x in data_loader: # x data/iter
         data.append(x)
     
     # 将数据列表拼接为一个张量
@@ -272,8 +272,9 @@ def load_data(paths, is_label=False):
     
     # 如果不是标签数据
     if not is_label:
-        # 对数据进行百分比截断处理
-        ########################################################################
+
+        # =============== 对数据进行百分比截断处理 ===============
+        
         # 计算数据张量的阈值
         TH = x.reshape(-1).numpy()
         # 根据设定的百分比确定阈值位置
