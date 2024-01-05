@@ -190,22 +190,22 @@ def norm_with_clip(x: tc.Tensor, smooth=1e-5):
 
 def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_normed=False):
     """
-    给定输入张量 x，添加噪声并返回处理后的张量
+    给定输入张量 x, 添加噪声并返回处理后的张量
 
-    参数:
-        - x: 输入张量，形状为 (batch, f1, f2, ...)
-        - max_randn_rate: 随机噪声的最大比例，默认为 0.1
-        - randn_rate: 可选参数，手动指定噪声比例，如果为 None 则随机生成
-        - x_already_normed: 布尔值，指示输入张量是否已经进行了标准化
+    Args:
+        - x: 输入张量，形状为 (batch, f1, f2, ...).
+        - max_randn_rate: 随机噪声的最大比例，默认为 0.1.
+        - randn_rate: 可选参数, 手动指定噪声比例，如果为 None 则随机生成.
+        - x_already_normed: 布尔值, 指示输入张量是否已经进行了标准化.
 
-    返回:
-        处理后的张量，其方差已被归一化
+    Returns:
+        处理后的张量, 其方差已被归一化.
 
-    注意:
-        - 如果输入张量已经标准化 (x_already_normed=True)，则 x_std 为全 1 张量，x_mean 为全 0 张量。
-        - 如果输入张量未标准化，根据输入的维度进行标准化处理。
+    Warning:
+        - 如果输入张量已经标准化 (x_already_normed=True)，则 x_std 为全 1 张量, x_mean 为全 0 张量.
+        - 如果输入张量未标准化，根据输入的维度进行标准化处理.
 
-    参考:
+    Reference:
         - https://blog.csdn.net/chaosir1991/article/details/106960408
     """
     ndim = x.ndim - 1
@@ -253,7 +253,7 @@ class Data_loader(Dataset):
         return img  # 返回处理后的图像
 
 def load_data(paths, is_label=False):
-    # 创建Data_loader对象，处理数据路径和是否为标签的标志
+    # 创建Dataset对象，处理数据路径和是否为标签的标志
     data_loader = Data_loader(paths, is_label)
     # 创建DataLoader，设置批量大小为16，使用2个工作进程加载数据
     data_loader = DataLoader(data_loader, batch_size=16, num_workers=2)
@@ -418,13 +418,14 @@ if __name__=='__main__':
     # =============== data path ===============
 
     train_x = [] # train_x=[[all pic of kidney_1_dense], [all pic of kidney_1_voi], ...]
-    train_y = []
+    train_y = [] # is the corresponding mask
     
     paths = CFG.paths 
 
-    # 遍历子路径
-    for i, path in enumerate(paths):
-        # 排除特定路径
+    # 'path' is the directory path of [kidney_1_dense, kidney_1_voi, ...]
+    for i, path in enumerate(paths): 
+
+        # 排除特定路径, but I think it will not be run.
         if path == f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense":    
             continue
         
