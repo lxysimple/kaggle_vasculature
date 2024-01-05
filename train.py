@@ -228,6 +228,8 @@ def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_norme
     return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
 
 class Data_loader(Dataset):
+    """" just put the data into the memory. """
+
     def __init__(self, paths, is_label):
         # 初始化函数，接收数据集路径和是否为标签的参数
         self.paths = paths  # 数据集路径列表
@@ -274,7 +276,7 @@ def load_data(paths, is_label=False):
     if not is_label:
 
         # =============== 对数据进行百分比截断处理 ===============
-        
+
         # 计算数据张量的阈值
         TH = x.reshape(-1).numpy()
         # 根据设定的百分比确定阈值位置
@@ -299,6 +301,8 @@ def load_data(paths, is_label=False):
     # 返回处理后的数据张量
     return x
 
+# ============================ validation metric ============================
+
 #https://www.kaggle.com/code/kashiwaba/sennet-hoa-train-unet-simple-baseline
 def dice_coef(y_pred: tc.Tensor, y_true: tc.Tensor, thr=0.5, dim=(-1, -2), epsilon=0.001):
     # 对预测值进行sigmoid激活，将其转换到0到1的范围
@@ -322,6 +326,10 @@ def dice_coef(y_pred: tc.Tensor, y_true: tc.Tensor, thr=0.5, dim=(-1, -2), epsil
     # 返回Dice系数作为评估指标
     return dice
 
+# ============================ validation metric ============================
+
+# ============================ train loss ============================
+
 class DiceLoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(DiceLoss, self).__init__()
@@ -343,12 +351,14 @@ class DiceLoss(nn.Module):
         
         # 返回 Dice 损失
         return 1 - dice
-
+    
+# ============================ train loss ============================
+    
 class Kaggld_Dataset(Dataset):
     def __init__(self, x: list, y: list, arg: bool = False):
         super(Dataset, self).__init__()
-        self.x = x  # 输入图像列表，每个元素为形状为(C, H, W)的图像
-        self.y = y  # 目标图像列表，每个元素为形状为(C, H, W)的图像
+        self.x = x  # 数据集列表，[[kidney_1_dense], [kidney_1_voi], ...]
+        self.y = y  # mask
         self.image_size = CFG.image_size  # 图像大小
         self.in_chans = CFG.in_chans  # 输入通道数
         self.arg = arg  # 是否进行数据增强
@@ -358,11 +368,13 @@ class Kaggld_Dataset(Dataset):
             self.transform = CFG.valid_aug  # 验证数据增强配置
 
     def __len__(self) -> int:
+        # 每in_chans个样本看做一个样本，即2.5D
         return sum([y.shape[0] - self.in_chans for y in self.y])
 
     def __getitem__(self, index):
 
-        # 我感觉是处理不同kidney数据集之间的一些不足量的末尾数据
+        # 某个数据集末尾的图片数凑不齐in_chans个的话，就从下一个数据集开始
+        # 感觉这个算法有点问题，另外不如把所有数据融到一起简单易懂
         i = 0
         for x in self.x:
             if index > x.shape[0] - self.in_chans:
@@ -370,9 +382,8 @@ class Kaggld_Dataset(Dataset):
                 i += 1
             else:
                 break
-        x = self.x[i] # 被赋值后的x是某一kidney所有图片集合
+        x = self.x[i] # 换到下一个肾数据集
         y = self.y[i]
-
 
         # # my code
         # if x.shape[1] < self.image_size:
@@ -389,11 +400,13 @@ class Kaggld_Dataset(Dataset):
         #     x = F.pad(x, padding_size)
         #     y = F.pad(y, padding_size)
             
-
+        # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
         x_index = np.random.randint(0, x.shape[1] - self.image_size)
         y_index = np.random.randint(0, x.shape[2] - self.image_size)
 
+        # 同时对in_chans个图进行裁剪
         x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+        # 这里为啥要//2？
         y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
 
         # 进行数据增强
@@ -501,9 +514,13 @@ if __name__=='__main__':
     scaler = tc.cuda.amp.GradScaler()
 
     # 设置学习率调度器，使用OneCycleLR策略
-    scheduler = tc.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=CFG.lr,
-                                                steps_per_epoch=len(train_dataset), epochs=CFG.epochs+1,
-                                                pct_start=0.1)
+    scheduler = tc.optim.lr_scheduler.OneCycleLR(
+        optimizer, 
+        max_lr=CFG.lr,
+        steps_per_epoch=len(train_dataset), 
+        epochs=CFG.epochs+1,
+        pct_start=0.1
+    )
 
     print("start the train!")
     # 循环训练模型
