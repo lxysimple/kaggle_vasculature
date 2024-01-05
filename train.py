@@ -1,4 +1,5 @@
-# 导入所需的库
+# ============================ import libraries ============================
+
 import torch as tc
 import torch.nn as nn
 import numpy as np
@@ -23,7 +24,10 @@ from glob import glob
 
 import torch.nn.functional as F
 
-########################################################################################
+# ============================ import libraries ============================
+
+# ============================ global configure ============================
+
 # 显存： 骨干网络的复杂度 vs 输入尺寸 vs 批大小
 # 【理想情况】：模型输入1024 * 1024，1500 * 1500
 
@@ -85,6 +89,9 @@ class CFG:
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
+
+############################### global configure ###############################
+
 
 ########################################################################################
 class CustomModel(nn.Module):
