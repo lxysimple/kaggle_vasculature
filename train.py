@@ -184,6 +184,8 @@ def norm_with_clip(x: tc.Tensor, smooth=1e-5):
 
     return x
 
+# ============================ add noise ============================
+
 def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_normed=False):
     """
     给定输入张量 x, 添加噪声并返回处理后的张量
