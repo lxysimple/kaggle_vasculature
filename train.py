@@ -40,7 +40,7 @@ class CFG:
     model_name = 'Unet'
     backbone = 'se_resnext50_32x4d'
 
-    in_chans = 1 # 5  # 输入通道数, 我感觉是5张图片看做一个样本
+    in_chans = 5 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
@@ -331,8 +331,6 @@ def dice_coef(y_pred: tc.Tensor, y_true: tc.Tensor, thr=0.5, dim=(-1, -2), epsil
     # 返回Dice系数作为评估指标
     return dice
 
-# ============================ validation metric ============================
-
 # ============================ train loss ============================
 
 class DiceLoss(nn.Module):
@@ -506,7 +504,7 @@ if __name__=='__main__':
     train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
     # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
     # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=2, shuffle=True, pin_memory=True)
-    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=True, pin_memory=True)
+    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=False, pin_memory=True)
 
     # 创建验证数据集对象，使用Kaggld_Dataset类，传入验证数据和标签
     val_dataset = Kaggld_Dataset([val_x], [val_y])
@@ -582,8 +580,6 @@ if __name__=='__main__':
             
             # 释放内存
             del loss, pred
-        
-        # =============== train ===============
             
         # =============== validation ===============
 
@@ -616,7 +612,3 @@ if __name__=='__main__':
             best_score = val_scores
             # tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
             tc.save(model.module.state_dict(), "./best.pt")
-
-        # =============== validation ===============
-            
-    # =============== start the train ===============
