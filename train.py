@@ -128,8 +128,7 @@ def build_model(weight="imagenet"):
 
     return model.cuda()
 
-
-
+# ============================ batch normalization ============================
 
 def min_max_normalization(x: tc.Tensor) -> tc.Tensor:
     """最小-最大归一化函数
@@ -179,7 +178,7 @@ def norm_with_clip(x: tc.Tensor, smooth=1e-5):
     # 标准化处理
     x = (x - mean) / (std + smooth)
 
-    # 对大于5和小于-3的值进行截断处理
+    # 对大于5和小于-3的值进行截断处理，即去除噪音
     x[x > 5] = (x[x > 5] - 5) * 1e-3 + 5
     x[x < -3] = (x[x < -3] + 3) * 1e-3 - 3
 
@@ -360,7 +359,7 @@ class DiceLoss(nn.Module):
 class Kaggld_Dataset(Dataset):
     def __init__(self, x: list, y: list, arg: bool = False):
         super(Dataset, self).__init__()
-        self.x = x  # 数据集列表，[[kidney_1_dense], [kidney_1_voi], ...]
+        self.x = x  
         self.y = y  # mask
         self.image_size = CFG.image_size  # 图像大小
         self.in_chans = CFG.in_chans  # 输入通道数
@@ -409,16 +408,17 @@ class Kaggld_Dataset(Dataset):
 
         # 同时对in_chans个图进行裁剪
         x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-        # 这里为啥要//2？
+        # 取中间的mask做为该2.5D样本的mask
         y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
 
-        # 进行数据增强
+        # 我感觉是为了与其他图像处理库或工具兼容，因为一些库（如 Matplotlib）期望图像的通道表示是 (H, W, C) 的形式
         data = self.transform(image=x.numpy().transpose(1, 2, 0), mask=y.numpy())
         x = data['image']
-        y = data['mask'] >= 127
+        y = data['mask'] >= 127 # ratate时会出现大于127的值，即异常值
 
         if self.arg:
             i = np.random.randint(4)
+            # x是3维，y是2维
             x = x.rot90(i, dims=(1, 2))
             y = y.rot90(i, dims=(0, 1))
             for i in range(3):
@@ -499,7 +499,7 @@ if __name__=='__main__':
 
     # =============== define objects ===============
     
-    # 创建训练数据集对象，使用Kaggld_Dataset类，传入训练数据和标签，arg=True表示进行一些额外的操作
+    # train_x=[kidney1{cut by z}, kidney1{cut by x}, kidney1{cut by y}, ...]
     train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
     # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
     # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=2, shuffle=True, pin_memory=True)
