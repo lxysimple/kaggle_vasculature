@@ -44,14 +44,14 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 896 # 896/512/1024  # 图片大小 
-    input_size = 896 # 896/512/1024   # 输入尺寸
+    image_size = 1920 # 896/512/1024/1920  # 图片大小 
+    input_size = 1920 # 896/512/1024/1920  # 输入尺寸
 
     train_batch_size = 8 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 20 # 20/40  # 训练轮数
+    epochs = 40 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
     chopping_percentile = 1e-3  # 切割百分比
@@ -73,6 +73,9 @@ class CFG:
 
     # ============== 数据增强 =============
     train_aug_list = [
+        # my code
+        A.Resize(height=1920, width=1920),
+
         A.Rotate(limit=45, p=0.5),  # 旋转
         A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
@@ -245,6 +248,10 @@ class Data_loader(Dataset):
         # 获取数据集中指定索引的样本
         img = cv2.imread(self.paths[index], cv2.IMREAD_GRAYSCALE)  # 读取灰度图像
         img = tc.from_numpy(img)  # 将图像转换为PyTorch张量
+
+        # my code
+
+
 
         if self.is_label:
             # 如果是标签数据，将非零像素值设为255（二值化）
@@ -438,9 +445,7 @@ if __name__=='__main__':
     # 启用cudnn加速，并进行基准测试
     tc.backends.cudnn.enabled = True
     tc.backends.cudnn.benchmark = True
-
-    # =============== optimize GPUs =============== 
-
+ 
     # =============== data path ===============
 
     train_x = [] # train_x=[[all pic of kidney_1_dense], [all pic of kidney_1_voi], ...]
