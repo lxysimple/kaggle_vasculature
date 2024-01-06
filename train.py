@@ -40,23 +40,24 @@ class CFG:
     model_name = 'Unet'
     backbone = 'se_resnext50_32x4d'
 
-    in_chans = 5  # 输入通道数, 我感觉是5张图片看做一个样本
+    in_chans = 1 # 5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 896 # 512/1024  # 图片大小 
-    input_size = 896 # 512/1024   # 输入尺寸
+    image_size = 512 # 896/512/1024  # 图片大小 
+    input_size = 512 # 896/512/1024   # 输入尺寸
 
     train_batch_size = 16  # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
+    num_workers = 2
 
-    epochs = 40 # 20/40  # 训练轮数
+    epochs = 20 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
     chopping_percentile = 1e-3  # 切割百分比
 
-    data_root = '/home/xyli/kaggle/'
-    # data_root = '/root/autodl-tmp/'
+    # data_root = '/home/xyli/kaggle/'
+    data_root = '/root/autodl-tmp/'
 
     paths = [
                 f"{data_root}blood-vessel-segmentation/train/kidney_1_dense",
@@ -260,7 +261,7 @@ def load_data(paths, is_label=False):
     # 创建Dataset对象，处理数据路径和是否为标签的标志
     data_loader = Data_loader(paths, is_label)
     # 创建DataLoader对象，设置批量大小为16，使用2个工作进程加载数据
-    data_loader = DataLoader(data_loader, batch_size=16, num_workers=2)
+    data_loader = DataLoader(data_loader, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers)
     # 存储数据的列表
     data = []
     # 遍历数据加载器，将每个批次的数据添加到列表中
@@ -505,13 +506,13 @@ if __name__=='__main__':
     train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
     # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
     # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=2, shuffle=True, pin_memory=True)
-    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=4, shuffle=True, pin_memory=True)
+    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=True, pin_memory=True)
 
     # 创建验证数据集对象，使用Kaggld_Dataset类，传入验证数据和标签
     val_dataset = Kaggld_Dataset([val_x], [val_y])
     # 创建验证数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
     # val_dataset = DataLoader(val_dataset, batch_size=CFG.valid_batch_size, num_workers=2, shuffle=False, pin_memory=True)
-    val_dataset = DataLoader(val_dataset, batch_size=CFG.valid_batch_size, num_workers=4, shuffle=False, pin_memory=True)
+    val_dataset = DataLoader(val_dataset, batch_size=CFG.valid_batch_size, num_workers=CFG.num_workers, shuffle=False, pin_memory=True)
 
     # 构建模型
     model = build_model()
