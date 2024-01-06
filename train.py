@@ -535,11 +535,11 @@ if __name__=='__main__':
     print("start the train!")
     # 循环训练模型
     for epoch in range(CFG.epochs):
+
+        # =============== train ===============
+
         model.train()
-        
-    #     # 创建进度条以显示训练进度
-    #     time = tqdm(range(len(train_dataset)))
-        
+               
         losss = 0
         scores = 0
         for i, (x, y) in enumerate(train_dataset):
@@ -569,24 +569,18 @@ if __name__=='__main__':
             losss = (losss * i + loss.item()) / (i + 1)
             scores = (scores * i + score) / (i + 1)
             
-    #         # 更新进度条
-    #         time.set_description(f"epoch:{epoch},loss:{losss:.4f},score:{scores:.4f},lr{optimizer.param_groups[0]['lr']:.4e}")
-    #         time.update()
             if i == len(train_dataset)-1:
                 print(f"epoch:{epoch},loss:{losss:.4f},score:{scores:.4f},lr{optimizer.param_groups[0]['lr']:.4e}")
             
             # 释放内存
             del loss, pred
         
-    #     # 关闭进度条
-    #     time.close()
-        
-        # 模型评估阶段
+        # =============== train ===============
+            
+        # =============== validation ===============
+
         model.eval()
         
-    #     # 创建进度条以显示验证进度
-    #     time = tqdm(range(len(val_dataset)))
-
         val_losss = 0
         val_scores = 0
         best_score = 0
@@ -608,22 +602,13 @@ if __name__=='__main__':
             val_losss = (val_losss * i + loss.item()) / (i + 1)
             val_scores = (val_scores * i + score) / (i + 1)
             
-    #         # 更新进度条
-    #         time.set_description(f"val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
-    #         time.update()
         print(f"val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
 
         if val_scores > best_score:
             best_score = val_scores
-            # 保存模型参数
             # tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
             tc.save(model.module.state_dict(), "./best.pt")
 
-    #     # 关闭进度条
-    #     time.close()
-
-    
-    # # 关闭最后一个进度条
-    # time.close()
+        # =============== validation ===============
             
     # =============== start the train ===============
