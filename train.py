@@ -24,8 +24,6 @@ from glob import glob
 
 import torch.nn.functional as F
 
-# ============================ import libraries ============================
-
 # ============================ global configure ============================
 
 # 显存： 骨干网络的复杂度 vs 输入尺寸 vs 批大小
@@ -130,7 +128,6 @@ def build_model(weight="imagenet"):
 
     return model.cuda()
 
-# ============================ the model ============================
 
 
 
@@ -227,6 +224,8 @@ def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_norme
     # 添加噪声并返回处理后的张量
     return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
 
+# ============================ dataset just for loading ============================
+
 class Data_loader(Dataset):
     """" just put the data into the memory. """
 
@@ -254,6 +253,8 @@ class Data_loader(Dataset):
 
         return img  # 返回处理后的图像
 
+# ============================ the model ============================
+    
 def load_data(paths, is_label=False):
     # 创建Dataset对象，处理数据路径和是否为标签的标志
     data_loader = Data_loader(paths, is_label)
@@ -267,7 +268,7 @@ def load_data(paths, is_label=False):
     for x in data_loader: # x data/iter
         data.append(x)
     
-    # 将数据列表拼接为一个张量
+    # 列表->张量
     x = tc.cat(data, dim=0)
     # 释放内存，删除数据列表
     del data
@@ -275,9 +276,9 @@ def load_data(paths, is_label=False):
     # 如果不是标签数据
     if not is_label:
 
-        # =============== 对数据进行百分比截断处理 ===============
+        # ============== 对数据进行百分比上截断处理 ===============
 
-        # 计算数据张量的阈值
+        # x拉成1维
         TH = x.reshape(-1).numpy()
         # 根据设定的百分比确定阈值位置
         index = -int(len(TH) * CFG.chopping_percentile)
@@ -285,8 +286,9 @@ def load_data(paths, is_label=False):
         TH: int = np.partition(TH, index)[index]
         # 将大于阈值的元素设置为阈值
         x[x > TH] = int(TH)
-        ########################################################################
-        # 重新计算数据张量的阈值
+
+        # ============== 下截断处理 ===============
+
         TH = x.reshape(-1).numpy()
         # 根据设定的百分比确定阈值位置
         index = -int(len(TH) * CFG.chopping_percentile)
@@ -294,12 +296,13 @@ def load_data(paths, is_label=False):
         TH: int = np.partition(TH, -index)[-index]
         # 将小于阈值的元素设置为阈值
         x[x < TH] = int(TH)
-        ########################################################################
+        
+        # ============== 归一化 ===============
+
         # 对数据进行最小-最大归一化，并将数据类型转换为uint8
         x = (min_max_normalization(x.to(tc.float16)[None])[0] * 255).to(tc.uint8)
     
-    # 返回处理后的数据张量
-    return x
+    return x # 返回处理后的数据张量
 
 # ============================ validation metric ============================
 
@@ -451,7 +454,7 @@ if __name__=='__main__':
         if path == f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense":    
             continue
         
-        # 加载图像数据（非标签）
+        # 每次加载一个数据集，也是一个3D肾
         x = load_data(glob(f"{path}/images/*"), is_label=False)
         print("train dataset x shape:", x.shape)
         
@@ -459,17 +462,19 @@ if __name__=='__main__':
         y = load_data(glob(f"{path}/labels/*"), is_label=True)
         print("train dataset y shape:", y.shape)
         
-        # 将数据添加到训练集
+        
+        # 将数据添加到训练集, (c,h,w)
         train_x.append(x)
         train_y.append(y)
 
-        # 数据维度变换及数据增强
-        #(C,H,W)
-        #augmentation
+        # 对1个3D肾进行特有的切片数据增强
+        # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
         train_x.append(x.permute(1, 2, 0))
         train_y.append(y.permute(1, 2, 0))
+        # (w,c,h),以y轴切
         train_x.append(x.permute(2, 0, 1))
         train_y.append(y.permute(2, 0, 1))
+    
     
 
     # 验证集路径
