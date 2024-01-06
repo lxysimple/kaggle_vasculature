@@ -44,8 +44,8 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 512 # 896/512/1024  # 图片大小 
-    input_size = 512 # 896/512/1024   # 输入尺寸
+    image_size = 896 # 896/512/1024  # 图片大小 
+    input_size = 896 # 896/512/1024   # 输入尺寸
 
     train_batch_size = 16  # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
