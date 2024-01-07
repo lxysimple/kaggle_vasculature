@@ -24,6 +24,8 @@ from glob import glob
 
 import torch.nn.functional as F
 
+from datetime import datetime
+
 # ============================ global configure ============================
 
 # 显存： 骨干网络的复杂度 vs 输入尺寸 vs 批大小
@@ -65,9 +67,9 @@ class CFG:
 
     paths = [
                 f"{data_root}blood-vessel-segmentation/train/kidney_1_dense",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_1_voi",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_2",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_3_sparse",
+                f"{data_root}blood-vessel-segmentation/train/kidney_1_voi",
+                f"{data_root}blood-vessel-segmentation/train/kidney_2",
+                f"{data_root}blood-vessel-segmentation/train/kidney_3_sparse",
 
                 # f"{data_root}blood-vessel-segmentation/train/kidney_3_dense",
             ]
@@ -606,7 +608,7 @@ if __name__=='__main__':
             scores = (scores * i + score) / (i + 1)
             
             if i == len(train_dataset)-1:
-                print(f"epoch:{epoch},loss:{losss:.4f},score:{scores:.4f},lr{optimizer.param_groups[0]['lr']:.4e}")
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},epoch:{epoch},loss:{losss:.4f},score:{scores:.4f},lr{optimizer.param_groups[0]['lr']:.4e}")
             
             # 释放显存
             del loss, pred
@@ -636,7 +638,7 @@ if __name__=='__main__':
             val_losss = (val_losss * i + loss.item()) / (i + 1)
             val_scores = (val_scores * i + score) / (i + 1)
             
-        print(f"val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
 
         if val_scores > best_score:
             best_score = val_scores
