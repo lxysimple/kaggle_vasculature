@@ -78,7 +78,7 @@ class CFG:
     valid_id = 1  # 验证集编号
 
     # ============== 数据增强 =============
-    
+
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
 
@@ -491,6 +491,7 @@ if __name__=='__main__':
             continue
         
         # 每次加载一个数据集，也是一个3D肾
+        # 这里需要进行一个排序吗？
         x = load_data(glob(f"{path}/images/*"), is_label=False)
         print("train dataset x shape:", x.shape)
         
