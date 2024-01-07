@@ -81,6 +81,7 @@ class CFG:
 
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
+        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
 
         A.Rotate(limit=45, p=0.5),  # 旋转
         A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
