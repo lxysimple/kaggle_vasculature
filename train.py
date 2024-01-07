@@ -47,13 +47,17 @@ class CFG:
     image_size = 1920 # 896/512/1024/1920  # 图片大小 
     input_size = 1920 # 896/512/1024/1920  # 输入尺寸
 
-    train_batch_size = 8 # 16 # 训练批量大小
+    # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
+    train_batch_size = 3 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 40 # 20/40  # 训练轮数
+    epochs = 60 # 20/40  # 训练轮数
     
-    lr = 6e-5  # 学习率
+    # lr = 6e-5  # 学习率
+    lr = 2e-5  
+
+
     chopping_percentile = 1e-3  # 切割百分比
 
     # data_root = '/home/xyli/kaggle/'
@@ -74,16 +78,23 @@ class CFG:
     # ============== 数据增强 =============
     train_aug_list = [
         # my code
-        A.Resize(height=1920, width=1920),
+        # A.Resize(height = input_size, width = input_size, always_apply=True, p=1),
+        A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
 
         A.Rotate(limit=45, p=0.5),  # 旋转
-        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
-        A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
+
+        # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+        # A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
+
         A.RandomGamma(p=0.75),  # 随机Gamma变换
         A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
         A.GaussianBlur(p=0.5),  # 高斯模糊
         A.MotionBlur(p=0.5),  # 运动模糊
         A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
+        
+        # my code, make sure the shape=(input_size, input_size), many transformers can change the shape
+        A.RandomCrop(input_size, input_size, p=1),  
+
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
@@ -91,6 +102,9 @@ class CFG:
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
+
+    # # my code
+    # my_aug = A.Compose([A.Resize(height=1920, width=1920),])
 
 # ============================ global configure ============================
 
@@ -409,15 +423,21 @@ class Kaggld_Dataset(Dataset):
         #     padding_size = (0, gap+1, 0, 0) # 填充右边0
         #     x = F.pad(x, padding_size)
         #     y = F.pad(y, padding_size)
-            
-        # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
-        x_index = np.random.randint(0, x.shape[1] - self.image_size)
-        y_index = np.random.randint(0, x.shape[2] - self.image_size)
 
-        # 同时对in_chans个图进行裁剪
-        x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-        # 取中间的mask做为该2.5D样本的mask
-        y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+            
+        # # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
+        # x_index = np.random.randint(0, x.shape[1] - self.image_size)
+        # y_index = np.random.randint(0, x.shape[2] - self.image_size)
+
+        # # 同时对in_chans个图进行裁剪
+        # x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+        # # 取中间的mask做为该2.5D样本的mask
+        # y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+
+        # my code
+        x = x[index:index + self.in_chans, :, :]
+        y = y[index + self.in_chans // 2, :, :]
+
 
         # 我感觉是为了与其他图像处理库或工具兼容，因为一些库（如 Matplotlib）期望图像的通道表示是 (H, W, C) 的形式
         data = self.transform(image=x.numpy().transpose(1, 2, 0), mask=y.numpy())
@@ -583,7 +603,7 @@ if __name__=='__main__':
             if i == len(train_dataset)-1:
                 print(f"epoch:{epoch},loss:{losss:.4f},score:{scores:.4f},lr{optimizer.param_groups[0]['lr']:.4e}")
             
-            # 释放内存
+            # 释放显存
             del loss, pred
             
         # =============== validation ===============
