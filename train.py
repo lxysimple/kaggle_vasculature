@@ -79,6 +79,7 @@ class CFG:
     train_aug_list = [
         # my code
         # A.Resize(height = input_size, width = input_size, always_apply=True, p=1),
+        # 确保图像至少有指定的高度和宽度,如果图片尺寸过大，则需要裁剪
         A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
 
         A.Rotate(limit=45, p=0.5),  # 旋转
@@ -99,6 +100,10 @@ class CFG:
     ]
     train_aug = A.Compose(train_aug_list)
     valid_aug_list = [
+        # my code
+        A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
+        A.RandomCrop(input_size, input_size, p=1),  
+
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
