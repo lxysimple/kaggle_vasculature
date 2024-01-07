@@ -56,8 +56,8 @@ class CFG:
 
     epochs = 60 # 20/40  # 训练轮数
     
-    # lr = 6e-5  # 学习率
-    lr = 2e-5  
+    lr = 6e-5  # 学习率
+ 
 
 
     chopping_percentile = 1e-3  # 切割百分比
@@ -557,7 +557,8 @@ if __name__=='__main__':
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
     scaler = tc.cuda.amp.GradScaler()
 
-    # 设置学习率调度器，使用OneCycleLR策略
+    # 使用OneCycleLR策略，单位:epoch
+    # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
     scheduler = tc.optim.lr_scheduler.OneCycleLR(
         optimizer, 
         max_lr=CFG.lr,
