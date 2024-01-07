@@ -78,15 +78,13 @@ class CFG:
     valid_id = 1  # 验证集编号
 
     # ============== 数据增强 =============
+    
+    # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
-        # my code
-        # A.Resize(height = input_size, width = input_size, always_apply=True, p=1),
-        # 确保图像至少有指定的高度和宽度,如果图片尺寸过大，则需要裁剪
-        A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
 
         A.Rotate(limit=45, p=0.5),  # 旋转
+        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
 
-        # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
         # A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
 
         A.RandomGamma(p=0.75),  # 随机Gamma变换
@@ -95,6 +93,11 @@ class CFG:
         A.MotionBlur(p=0.5),  # 运动模糊
         A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
         
+        # my code
+        # A.Resize(height = input_size, width = input_size, always_apply=True, p=1),
+        # 确保图像至少有指定的高度和宽度,如果图片尺寸过大，则需要裁剪
+        A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
+
         # my code, make sure the shape=(input_size, input_size), many transformers can change the shape
         A.RandomCrop(input_size, input_size, p=1),  
 
