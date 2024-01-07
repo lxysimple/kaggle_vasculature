@@ -491,7 +491,7 @@ if __name__=='__main__':
             continue
         
         # 每次加载一个数据集，也是一个3D肾
-        # 这里需要进行一个排序吗？
+        # 这里90%已经被自动排序了
         x = load_data(glob(f"{path}/images/*"), is_label=False)
         print("train dataset x shape:", x.shape)
         
