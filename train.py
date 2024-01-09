@@ -278,10 +278,6 @@ class Data_loader(Dataset):
         img = cv2.imread(self.paths[index], cv2.IMREAD_GRAYSCALE)  # 读取灰度图像
         img = tc.from_numpy(img)  # 将图像转换为PyTorch张量
 
-        # my code
-
-
-
         if self.is_label:
             # 如果是标签数据，将非零像素值设为255（二值化）
             img = (img != 0).to(tc.uint8) * 255
@@ -294,6 +290,8 @@ class Data_loader(Dataset):
 # ============================ the model ============================
     
 def load_data(paths, is_label=False):
+    """ 用空间换时间 """
+
     # 创建Dataset对象，处理数据路径和是否为标签的标志
     data_loader = Data_loader(paths, is_label)
     # 创建DataLoader对象，设置批量大小为16，使用2个工作进程加载数据

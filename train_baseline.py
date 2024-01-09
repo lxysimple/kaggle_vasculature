@@ -42,7 +42,7 @@ class CFG:
     model_name = 'Unet'
     backbone = 'se_resnext50_32x4d'
 
-    in_chans = 5 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
+    in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
@@ -54,7 +54,7 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 40 # 20/40  # 训练轮数
+    epochs = 20 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
  
@@ -63,15 +63,15 @@ class CFG:
     chopping_percentile = 1e-3  # 切割百分比
 
     # data_root = '/home/xyli/kaggle/'
-    data_root = '/root/autodl-tmp/'
+    data_root = '/root/autodl-tmp'
 
     paths = [
-                f"{data_root}blood-vessel-segmentation/train/kidney_1_dense",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_1_voi",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_2",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_3_sparse",
+                f"{data_root}/train/kidney_1_dense",
+                # f"{data_root}/train/kidney_1_voi",
+                # f"{data_root}/train/kidney_2",
+                # f"{data_root}/train/kidney_3_sparse",
 
-                # f"{data_root}blood-vessel-segmentation/train/kidney_3_dense",
+                # f"{data_root}/train/kidney_3_dense",
             ]
 
     # ============== 折数 =============
@@ -81,26 +81,16 @@ class CFG:
 
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
-        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
-
-        A.Rotate(limit=45, p=0.5),  # 旋转
-        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
-
-        A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
-
-        A.RandomGamma(p=0.75),  # 随机Gamma变换
-        A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
-        A.GaussianBlur(p=0.5),  # 高斯模糊
-        A.MotionBlur(p=0.5),  # 运动模糊
-        A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
         
-        # my code
-        # A.Resize(height = input_size, width = input_size, always_apply=True, p=1),
-        # 确保图像至少有指定的高度和宽度,如果图片尺寸过大，则需要裁剪
-        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
-
-        # my code, make sure the shape=(input_size, input_size), many transformers can change the shape
-        # A.RandomCrop(input_size, input_size, p=1),  
+        # A.Rotate(limit=45, p=0.5),  # 旋转
+        # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+        A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
+        # A.RandomGamma(p=0.75),  # 随机Gamma变换
+        # A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
+        # A.GaussianBlur(p=0.5),  # 高斯模糊
+        # A.MotionBlur(p=0.5),  # 运动模糊
+        # A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
+        
 
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
@@ -142,6 +132,7 @@ class CustomModel(nn.Module):
         return output[:, 0]  # 选择输出的第一个通道，这里假设输出是多通道的sigmoid()
 
 # mv /home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth /home/xyli/.cache/torch/hub/checkpoints/
+# mv /root/xy/se_resnext50_32x4d-a260b3a4.pth  /root/.cache/torch/hub/checkpoints
 def build_model(weight="imagenet"):
     # # 加载环境变量
     # load_dotenv()
@@ -153,11 +144,11 @@ def build_model(weight="imagenet"):
     print('backbone', CFG.backbone)
 
     # 构建并返回模型
-    # model = CustomModel(CFG, weight)
+    model = CustomModel(CFG, weight)
 
-    # my code
-    model = CustomModel(CFG, None)
-    model.load_state_dict(tc.load('/root/xy/best.pt'))
+    # # my code
+    # model = CustomModel(CFG, None)
+    # model.load_state_dict(tc.load('/root/xy/se_resnext50_32x4d-a260b3a4.pth'))
 
     return model.cuda()
 
@@ -278,10 +269,6 @@ class Data_loader(Dataset):
         img = cv2.imread(self.paths[index], cv2.IMREAD_GRAYSCALE)  # 读取灰度图像
         img = tc.from_numpy(img)  # 将图像转换为PyTorch张量
 
-        # my code
-
-
-
         if self.is_label:
             # 如果是标签数据，将非零像素值设为255（二值化）
             img = (img != 0).to(tc.uint8) * 255
@@ -294,6 +281,8 @@ class Data_loader(Dataset):
 # ============================ the model ============================
     
 def load_data(paths, is_label=False):
+    
+
     # 创建Dataset对象，处理数据路径和是否为标签的标志
     data_loader = Data_loader(paths, is_label)
     # 创建DataLoader对象，设置批量大小为16，使用2个工作进程加载数据
@@ -314,26 +303,27 @@ def load_data(paths, is_label=False):
     # 如果不是标签数据
     if not is_label:
 
-        # ============== 对数据进行百分比上截断处理,去除异常点 ===============
+        # # ============== 对数据进行百分比上截断处理,去除异常点 ===============
 
-        # x拉成1维
-        TH = x.reshape(-1).numpy()
-        # 根据设定的百分比确定阈值位置
-        index = -int(len(TH) * CFG.chopping_percentile)
-        # 对阈值进行分区操作，并取得分区后的阈值
-        TH: int = np.partition(TH, index)[index]
-        # 将大于阈值的元素设置为阈值
-        x[x > TH] = int(TH)
+        # # x拉成1维
+        # TH = x.reshape(-1).numpy()
+        # # 根据设定的百分比确定阈值位置
+        # index = -int(len(TH) * CFG.chopping_percentile)
+        # # 对阈值进行分区操作，并取得分区后的阈值
+        # TH: int = np.partition(TH, index)[index]
+        # # 将大于阈值的元素设置为阈值
+        # x[x > TH] = int(TH)
 
-        # ============== 下截断处理 ===============
+        # # ============== 下截断处理 ===============
 
-        TH = x.reshape(-1).numpy()
-        # 根据设定的百分比确定阈值位置
-        index = -int(len(TH) * CFG.chopping_percentile)
-        # 对阈值进行分区操作，并取得分区后的阈值
-        TH: int = np.partition(TH, -index)[-index]
-        # 将小于阈值的元素设置为阈值
-        x[x < TH] = int(TH)
+        # TH = x.reshape(-1).numpy()
+        # # 根据设定的百分比确定阈值位置
+        # index = -int(len(TH) * CFG.chopping_percentile)
+        # # 对阈值进行分区操作，并取得分区后的阈值
+        # TH: int = np.partition(TH, -index)[-index]
+        # # 将小于阈值的元素设置为阈值
+        # x[x < TH] = int(TH)
+
         
         # ============== 归一化 ===============
 
@@ -428,17 +418,17 @@ class Kaggld_Dataset(Dataset):
         # x_index = np.random.randint(0, x.shape[1] - self.image_size )
         # y_index = np.random.randint(0, x.shape[2] - self.image_size )
         # my code
-        x_index = np.random.randint(0, x.shape[1] - self.image_size + 1)
-        y_index = np.random.randint(0, x.shape[2] - self.image_size + 1)
+        # x_index = np.random.randint(0, x.shape[1] - self.image_size + 1)
+        # y_index = np.random.randint(0, x.shape[2] - self.image_size + 1)
 
-        # 同时对in_chans个图进行裁剪
-        x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-        # 取中间的mask做为该2.5D样本的mask
-        y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+        # # 同时对in_chans个图进行裁剪
+        # x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+        # # 取中间的mask做为该2.5D样本的mask
+        # y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
 
-        # # my code
-        # x = x[index:index + self.in_chans, :, :]
-        # y = y[index + self.in_chans // 2, :, :]
+        # my code
+        x = x[index:index + self.in_chans, :, :]
+        y = y[index + self.in_chans // 2, :, :]
 
 
         # 我感觉是为了与其他图像处理库或工具兼容，因为一些库（如 Matplotlib）期望图像的通道表示是 (H, W, C) 的形式
@@ -446,16 +436,17 @@ class Kaggld_Dataset(Dataset):
         x = data['image']
         y = data['mask'] >= 127 # ratate时会出现大于127的值，即异常值
 
-        if self.arg:
-            i = np.random.randint(4)
-            # x是3维，y是2维
-            x = x.rot90(i, dims=(1, 2))
-            y = y.rot90(i, dims=(0, 1))
-            for i in range(3):
-                if np.random.randint(2):
-                    x = x.flip(dims=(i,))
-                    if i >= 1:
-                        y = y.flip(dims=(i - 1,))
+        # if self.arg:
+        #     i = np.random.randint(4)
+        #     # x是3维，y是2维
+        #     x = x.rot90(i, dims=(1, 2))
+        #     y = y.rot90(i, dims=(0, 1))
+        #     for i in range(3):
+        #         if np.random.randint(2):
+        #             x = x.flip(dims=(i,))
+        #             if i >= 1:
+        #                 y = y.flip(dims=(i - 1,))
+
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
 # ============================ the main ============================
@@ -479,7 +470,7 @@ if __name__=='__main__':
     for i, path in enumerate(paths): 
 
         # 排除特定路径, but I think it will not be run.
-        if path == f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense":    
+        if path == f"{CFG.data_root}/train/kidney_3_dense":    
             continue
         
         # 每次加载一个数据集，也是一个3D肾
@@ -496,19 +487,19 @@ if __name__=='__main__':
         train_x.append(x)
         train_y.append(y)
 
-        # 对1个3D肾进行特有的切片数据增强
-        # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
-        train_x.append(x.permute(1, 2, 0))
-        train_y.append(y.permute(1, 2, 0))
-        # (w,c,h),以y轴切
-        train_x.append(x.permute(2, 0, 1))
-        train_y.append(y.permute(2, 0, 1))
+        # # 对1个3D肾进行特有的切片数据增强
+        # # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
+        # train_x.append(x.permute(1, 2, 0))
+        # train_y.append(y.permute(1, 2, 0))
+        # # (w,c,h),以y轴切
+        # train_x.append(x.permute(2, 0, 1))
+        # train_y.append(y.permute(2, 0, 1))
     
     
 
     # 验证集路径
-    path1 = f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
-    path2 = f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense"
+    path1 = f"{CFG.data_root}/train/kidney_3_sparse"
+    path2 = f"{CFG.data_root}/train/kidney_3_dense"
 
     # 获取验证集图像和标签路径列表
     paths_y = glob(f"{path2}/labels/*")
@@ -584,8 +575,8 @@ if __name__=='__main__':
             y = y.cuda().to(tc.float32)
             
             # 数据预处理
-            x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
-            x = add_noise(x, max_randn_rate=0.5, x_already_normed=True)
+            # x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
+            # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True)
             
             # 使用自动混合精度进行前向传播和损失计算
             with autocast():
