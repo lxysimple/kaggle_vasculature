@@ -46,15 +46,15 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 1920 # 896/512/1024/1920  # 图片大小 
-    input_size = 1920 # 896/512/1024/1920  # 输入尺寸
+    image_size = 512 # 896/512/1024/1920  # 图片大小 
+    input_size = 512 # 896/512/1024/1920  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 3 # 16 # 训练批量大小
+    train_batch_size = 16 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 60 # 20/40  # 训练轮数
+    epochs = 20 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
  
@@ -86,7 +86,7 @@ class CFG:
         A.Rotate(limit=45, p=0.5),  # 旋转
         A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
 
-        # A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
+        A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
 
         A.RandomGamma(p=0.75),  # 随机Gamma变换
         A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
@@ -97,18 +97,18 @@ class CFG:
         # my code
         # A.Resize(height = input_size, width = input_size, always_apply=True, p=1),
         # 确保图像至少有指定的高度和宽度,如果图片尺寸过大，则需要裁剪
-        A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
+        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
 
         # my code, make sure the shape=(input_size, input_size), many transformers can change the shape
-        A.RandomCrop(input_size, input_size, p=1),  
+        # A.RandomCrop(input_size, input_size, p=1),  
 
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
     valid_aug_list = [
         # my code
-        A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
-        A.RandomCrop(input_size, input_size, p=1),  
+        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
+        # A.RandomCrop(input_size, input_size, p=1),  
 
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
@@ -419,35 +419,22 @@ class Kaggld_Dataset(Dataset):
                 break
         x = self.x[i] # 换到下一个肾数据集
         y = self.y[i]
+            
+        # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
+        # x_index = np.random.randint(0, x.shape[1] - self.image_size )
+        # y_index = np.random.randint(0, x.shape[2] - self.image_size )
+        # my code
+        x_index = np.random.randint(0, x.shape[1] - self.image_size + 1)
+        y_index = np.random.randint(0, x.shape[2] - self.image_size + 1)
+
+        # 同时对in_chans个图进行裁剪
+        x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+        # 取中间的mask做为该2.5D样本的mask
+        y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
 
         # # my code
-        # if x.shape[1] < self.image_size:
-        #     gap = self.image_size - x.shape[1]
-        #     # 按照 (left, right, top, bottom) 的顺序表示在四个方向上的填充大小
-        #     padding_size = (0, 0, 0, gap+1) # 底部填充0
-        #     x = F.pad(x, padding_size)
-        #     y = F.pad(y, padding_size)
-
-        # if x.shape[2] < self.image_size:
-        #     gap = self.image_size - x.shape[2]
-        #     # 按照 (left, right, top, bottom) 的顺序表示在四个方向上的填充大小
-        #     padding_size = (0, gap+1, 0, 0) # 填充右边0
-        #     x = F.pad(x, padding_size)
-        #     y = F.pad(y, padding_size)
-
-            
-        # # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
-        # x_index = np.random.randint(0, x.shape[1] - self.image_size)
-        # y_index = np.random.randint(0, x.shape[2] - self.image_size)
-
-        # # 同时对in_chans个图进行裁剪
-        # x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-        # # 取中间的mask做为该2.5D样本的mask
-        # y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-
-        # my code
-        x = x[index:index + self.in_chans, :, :]
-        y = y[index + self.in_chans // 2, :, :]
+        # x = x[index:index + self.in_chans, :, :]
+        # y = y[index + self.in_chans // 2, :, :]
 
 
         # 我感觉是为了与其他图像处理库或工具兼容，因为一些库（如 Matplotlib）期望图像的通道表示是 (H, W, C) 的形式
