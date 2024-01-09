@@ -615,7 +615,7 @@ if __name__=='__main__':
 
         model.eval()
         
-        val_losss = 0
+        val_losss = 99999
         val_scores = 0
         
         for i, (x, y) in enumerate(val_dataset):
