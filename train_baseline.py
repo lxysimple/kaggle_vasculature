@@ -46,8 +46,8 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 512 # 896/512/1024/1920  # 图片大小 
-    input_size = 512 # 896/512/1024/1920  # 输入尺寸
+    image_size = 512 # 512/768/1024/1280/1536  # 图片大小 
+    input_size = 512 # 512/768/1024/1280/1536  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     train_batch_size = 16 # 16 # 训练批量大小
@@ -58,7 +58,7 @@ class CFG:
     
     lr = 6e-5  # 学习率
  
-
+ 
 
     chopping_percentile = 1e-3  # 切割百分比
 
@@ -126,6 +126,8 @@ class CustomModel(nn.Module):
         )
 
     def forward(self, image):
+
+
         # 模型的前向传播
         output = self.model(image)
         # 如果需要，可以在这里对输出进行额外的处理
@@ -438,16 +440,16 @@ class Kaggld_Dataset(Dataset):
         x = data['image']
         y = data['mask'] >= 127 # ratate时会出现大于127的值，即异常值
 
-        if self.arg:
-            i = np.random.randint(4)
-            # x是3维，y是2维
-            x = x.rot90(i, dims=(1, 2))
-            y = y.rot90(i, dims=(0, 1))
-            for i in range(3):
-                if np.random.randint(2):
-                    x = x.flip(dims=(i,))
-                    if i >= 1:
-                        y = y.flip(dims=(i - 1,))
+        # if self.arg:
+        #     i = np.random.randint(4)
+        #     # x是3维，y是2维
+        #     x = x.rot90(i, dims=(1, 2))
+        #     y = y.rot90(i, dims=(0, 1))
+        #     for i in range(3):
+        #         if np.random.randint(2):
+        #             x = x.flip(dims=(i,))
+        #             if i >= 1:
+        #                 y = y.flip(dims=(i - 1,))
 
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
@@ -489,13 +491,13 @@ if __name__=='__main__':
         train_x.append(x)
         train_y.append(y)
 
-        # # 对1个3D肾进行特有的切片数据增强
-        # # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
-        # train_x.append(x.permute(1, 2, 0))
-        # train_y.append(y.permute(1, 2, 0))
-        # # (w,c,h),以y轴切
-        # train_x.append(x.permute(2, 0, 1))
-        # train_y.append(y.permute(2, 0, 1))
+        # 对1个3D肾进行特有的切片数据增强
+        # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
+        train_x.append(x.permute(1, 2, 0))
+        train_y.append(y.permute(1, 2, 0))
+        # (w,c,h),以y轴切
+        train_x.append(x.permute(2, 0, 1))
+        train_y.append(y.permute(2, 0, 1))
     
     
 
@@ -580,7 +582,7 @@ if __name__=='__main__':
             
             # 数据预处理
             x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
-            # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True)
+            # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
             # 使用自动混合精度进行前向传播和损失计算
             with autocast():
@@ -634,7 +636,8 @@ if __name__=='__main__':
             val_scores = (val_scores * i + score) / (i + 1)
             
         print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
-        
+        print()
+
         if epoch>=10:
             avg_score = avg_score + val_scores
 
