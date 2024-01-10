@@ -54,7 +54,7 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 40 # 20/40  # 训练轮数
+    epochs = 20 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
  
@@ -63,15 +63,16 @@ class CFG:
     chopping_percentile = 1e-3  # 切割百分比
 
     # data_root = '/home/xyli/kaggle/'
-    data_root = '/root/autodl-tmp/'
+    # data_root = '/root/autodl-tmp/'
+    data_root = '/root/autodl-tmp'
 
     paths = [
-                f"{data_root}blood-vessel-segmentation/train/kidney_1_dense",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_1_voi",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_2",
-                # f"{data_root}blood-vessel-segmentation/train/kidney_3_sparse",
+                f"{data_root}/train/kidney_1_dense",
+                f"{data_root}/train/kidney_1_voi",
+                f"{data_root}/train/kidney_2",
+                f"{data_root}/train/kidney_3_sparse",
 
-                # f"{data_root}blood-vessel-segmentation/train/kidney_3_dense",
+                # f"{data_root}/train/kidney_3_dense",
             ]
 
     # ============== 折数 =============
@@ -81,43 +82,33 @@ class CFG:
 
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
-        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
+        # useless
+        # A.RandomGamma(p=0.75),  # 随机Gamma变换
 
         A.Rotate(limit=45, p=0.5),  # 旋转
         A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
 
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
 
-        A.RandomGamma(p=0.75),  # 随机Gamma变换
         A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
         A.GaussianBlur(p=0.5),  # 高斯模糊
         A.MotionBlur(p=0.5),  # 运动模糊
         A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
-        
-        # my code
-        # A.Resize(height = input_size, width = input_size, always_apply=True, p=1),
-        # 确保图像至少有指定的高度和宽度,如果图片尺寸过大，则需要裁剪
-        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
 
-        # my code, make sure the shape=(input_size, input_size), many transformers can change the shape
-        # A.RandomCrop(input_size, input_size, p=1),  
+        # my code
+        A.Transpose(always_apply=False, p=0.5), # 通过交换行和列来转置输入
+        A.RandomGridShuffle(grid=(3, 3), always_apply=False, p=0.5), # 随机网格洗牌
+        A.InvertImg(always_apply=False, p=0.5), # 通过从255减去像素值来反转输入图像
 
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
     valid_aug_list = [
-        # my code
-        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
-        # A.RandomCrop(input_size, input_size, p=1),  
-
+        # 注意这个不是整张图片，而是在随机裁剪的图片上做验证的
+        A.RandomCrop(input_size, input_size, p=1),  
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
-
-    # # my code
-    # my_aug = A.Compose([A.Resize(height=1920, width=1920),])
-
-# ============================ global configure ============================
 
 # ============================ the model ============================
     
@@ -153,11 +144,11 @@ def build_model(weight="imagenet"):
     print('backbone', CFG.backbone)
 
     # 构建并返回模型
-    # model = CustomModel(CFG, weight)
+    model = CustomModel(CFG, weight)
 
-    # my code
-    model = CustomModel(CFG, None)
-    model.load_state_dict(tc.load('/root/xy/best.pt'))
+    # # my code
+    # model = CustomModel(CFG, None)
+    # model.load_state_dict(tc.load('/root/xy/se_resnext50_32x4d-a260b3a4.pth'))
 
     return model.cuda()
 
@@ -219,44 +210,44 @@ def norm_with_clip(x: tc.Tensor, smooth=1e-5):
 
 # ============================ add noise ============================
 
-def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_normed=False):
-    """
-    给定输入张量 x, 添加噪声并返回处理后的张量
+# def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_normed=False):
+#     """
+#     给定输入张量 x, 添加噪声并返回处理后的张量
 
-    Args:
-        - x: 输入张量，形状为 (batch, f1, f2, ...).
-        - max_randn_rate: 随机噪声的最大比例，默认为 0.1.
-        - randn_rate: 可选参数, 手动指定噪声比例，如果为 None 则随机生成.
-        - x_already_normed: 布尔值, 指示输入张量是否已经进行了标准化.
+#     Args:
+#         - x: 输入张量，形状为 (batch, f1, f2, ...).
+#         - max_randn_rate: 随机噪声的最大比例，默认为 0.1.
+#         - randn_rate: 可选参数, 手动指定噪声比例，如果为 None 则随机生成.
+#         - x_already_normed: 布尔值, 指示输入张量是否已经进行了标准化.
 
-    Returns:
-        处理后的张量, 其方差已被归一化.
+#     Returns:
+#         处理后的张量, 其方差已被归一化.
 
-    Warning:
-        - 如果输入张量已经标准化 (x_already_normed=True)，则 x_std 为全 1 张量, x_mean 为全 0 张量.
-        - 如果输入张量未标准化，根据输入的维度进行标准化处理.
+#     Warning:
+#         - 如果输入张量已经标准化 (x_already_normed=True)，则 x_std 为全 1 张量, x_mean 为全 0 张量.
+#         - 如果输入张量未标准化，根据输入的维度进行标准化处理.
 
-    Reference:
-        - https://blog.csdn.net/chaosir1991/article/details/106960408
-    """
-    ndim = x.ndim - 1
+#     Reference:
+#         - https://blog.csdn.net/chaosir1991/article/details/106960408
+#     """
+#     ndim = x.ndim - 1
 
-    if x_already_normed:
-        x_std = tc.ones([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
-        x_mean = tc.zeros([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
-    else:
-        dim = list(range(1, x.ndim))
-        x_std = x.std(dim=dim, keepdim=True)
-        x_mean = x.mean(dim=dim, keepdim=True)
+#     if x_already_normed:
+#         x_std = tc.ones([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
+#         x_mean = tc.zeros([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
+#     else:
+#         dim = list(range(1, x.ndim))
+#         x_std = x.std(dim=dim, keepdim=True)
+#         x_mean = x.mean(dim=dim, keepdim=True)
 
-    if randn_rate is None:
-        randn_rate = max_randn_rate * np.random.rand() * tc.rand(x_mean.shape, device=x.device, dtype=x.dtype)
+#     if randn_rate is None:
+#         randn_rate = max_randn_rate * np.random.rand() * tc.rand(x_mean.shape, device=x.device, dtype=x.dtype)
 
-    # 计算噪声缩放系数
-    cache = (x_std ** 2 + (x_std * randn_rate) ** 2) ** 0.5 + 1e-7
+#     # 计算噪声缩放系数
+#     cache = (x_std ** 2 + (x_std * randn_rate) ** 2) ** 0.5 + 1e-7
 
-    # 添加噪声并返回处理后的张量
-    return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
+#     # 添加噪声并返回处理后的张量
+#     return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
 
 # ============================ dataset just for loading ============================
 
@@ -422,21 +413,21 @@ class Kaggld_Dataset(Dataset):
         x = self.x[i] # 换到下一个肾数据集
         y = self.y[i]
             
-        # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
-        # x_index = np.random.randint(0, x.shape[1] - self.image_size )
-        # y_index = np.random.randint(0, x.shape[2] - self.image_size )
-        # my code
-        x_index = np.random.randint(0, x.shape[1] - self.image_size + 1)
-        y_index = np.random.randint(0, x.shape[2] - self.image_size + 1)
-
-        # 同时对in_chans个图进行裁剪
-        x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-        # 取中间的mask做为该2.5D样本的mask
-        y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
-
+        # # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
+        # # x_index = np.random.randint(0, x.shape[1] - self.image_size )
+        # # y_index = np.random.randint(0, x.shape[2] - self.image_size )
         # # my code
-        # x = x[index:index + self.in_chans, :, :]
-        # y = y[index + self.in_chans // 2, :, :]
+        # x_index = np.random.randint(0, x.shape[1] - self.image_size + 1)
+        # y_index = np.random.randint(0, x.shape[2] - self.image_size + 1)
+
+        # # 同时对in_chans个图进行裁剪
+        # x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+        # # 取中间的mask做为该2.5D样本的mask
+        # y = y[index + self.in_chans // 2, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
+
+        # my code
+        x = x[index:index + self.in_chans, :, :]
+        y = y[index + self.in_chans // 2, :, :]
 
 
         # 我感觉是为了与其他图像处理库或工具兼容，因为一些库（如 Matplotlib）期望图像的通道表示是 (H, W, C) 的形式
@@ -444,16 +435,16 @@ class Kaggld_Dataset(Dataset):
         x = data['image']
         y = data['mask'] >= 127 # ratate时会出现大于127的值，即异常值
 
-        if self.arg:
-            i = np.random.randint(4)
-            # x是3维，y是2维
-            x = x.rot90(i, dims=(1, 2))
-            y = y.rot90(i, dims=(0, 1))
-            for i in range(3):
-                if np.random.randint(2):
-                    x = x.flip(dims=(i,))
-                    if i >= 1:
-                        y = y.flip(dims=(i - 1,))
+        # if self.arg:
+        #     i = np.random.randint(4)
+        #     # x是3维，y是2维
+        #     x = x.rot90(i, dims=(1, 2))
+        #     y = y.rot90(i, dims=(0, 1))
+        #     for i in range(3):
+        #         if np.random.randint(2):
+        #             x = x.flip(dims=(i,))
+        #             if i >= 1:
+        #                 y = y.flip(dims=(i - 1,))
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
 # ============================ the main ============================
@@ -477,7 +468,7 @@ if __name__=='__main__':
     for i, path in enumerate(paths): 
 
         # 排除特定路径, but I think it will not be run.
-        if path == f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense":    
+        if path == f"{CFG.data_root}/train/kidney_3_dense":    
             continue
         
         # 每次加载一个数据集，也是一个3D肾
@@ -502,11 +493,9 @@ if __name__=='__main__':
         train_x.append(x.permute(2, 0, 1))
         train_y.append(y.permute(2, 0, 1))
     
-    
-
     # 验证集路径
-    path1 = f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_sparse"
-    path2 = f"{CFG.data_root}blood-vessel-segmentation/train/kidney_3_dense"
+    path1 = f"{CFG.data_root}/train/kidney_3_sparse"
+    path2 = f"{CFG.data_root}/train/kidney_3_dense"
 
     # 获取验证集图像和标签路径列表
     paths_y = glob(f"{path2}/labels/*")
@@ -567,7 +556,9 @@ if __name__=='__main__':
 
     print("start the train!")
     best_score = 0.0
-    best_valid = 0.0
+    best_valid = 999.0
+    avg_score = 0.0
+    avg_train_score = 0.0
     for epoch in range(CFG.epochs):
 
         # =============== train ===============
@@ -583,7 +574,7 @@ if __name__=='__main__':
             
             # 数据预处理
             x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
-            x = add_noise(x, max_randn_rate=0.5, x_already_normed=True)
+            # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
             # 使用自动混合精度进行前向传播和损失计算
             with autocast():
@@ -608,12 +599,14 @@ if __name__=='__main__':
             
             # 释放显存
             del loss, pred
-            
+        
+        if epoch>=10:
+                avg_train_score = avg_train_score + scores
         # =============== validation ===============
 
         model.eval()
         
-        val_losss = 99999
+        val_losss = 0
         val_scores = 0
         
         for i, (x, y) in enumerate(val_dataset):
@@ -635,13 +628,20 @@ if __name__=='__main__':
             val_scores = (val_scores * i + score) / (i + 1)
             
         print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
+        print()
+
+        if epoch>=10:
+            avg_score = avg_score + val_scores
 
         if val_scores > best_score:
             best_score = val_scores
-            # tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
-            tc.save(model.module.state_dict(), "./best_score.pt")
+            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+            # tc.save(model.module.state_dict(), "./best_score.pt")
             
         if val_losss < best_valid:
             best_valid = val_losss
-            # tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
-            tc.save(model.module.state_dict(), "./best_loss.pt")
+            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+            # tc.save(model.module.state_dict(), "./best_loss.pt")
+    
+    print("10-19 epoch avg vaild score: ", avg_score/10)
+    print("10-19 epoch avg train score: ", avg_train_score/10)

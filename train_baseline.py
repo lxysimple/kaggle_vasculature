@@ -491,13 +491,13 @@ if __name__=='__main__':
         train_x.append(x)
         train_y.append(y)
 
-        # 对1个3D肾进行特有的切片数据增强
-        # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
-        train_x.append(x.permute(1, 2, 0))
-        train_y.append(y.permute(1, 2, 0))
-        # (w,c,h),以y轴切
-        train_x.append(x.permute(2, 0, 1))
-        train_y.append(y.permute(2, 0, 1))
+        # # 对1个3D肾进行特有的切片数据增强
+        # # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
+        # train_x.append(x.permute(1, 2, 0))
+        # train_y.append(y.permute(1, 2, 0))
+        # # (w,c,h),以y轴切
+        # train_x.append(x.permute(2, 0, 1))
+        # train_y.append(y.permute(2, 0, 1))
     
     
 
