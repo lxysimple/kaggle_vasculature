@@ -99,8 +99,7 @@ class CFG:
         # A.Transpose(always_apply=False, p=0.5), # 通过交换行和列来转置输入
         # A.RandomGridShuffle(grid=(3, 3), always_apply=False, p=0.5), # 随机网格洗牌
         # A.InvertImg(always_apply=False, p=0.5), # 通过从255减去像素值来反转输入图像
-        A.Cutout(num_holes=8, max_h_size=8, max_w_size=8, fill_value=0, always_apply=False, p=0.5), # 在图像中生成正方形区域
-
+        
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
@@ -417,10 +416,10 @@ class Kaggld_Dataset(Dataset):
         x = self.x[i] # 换到下一个肾数据集
         y = self.y[i]
             
-        # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
-        # x_index = np.random.randint(0, x.shape[1] - self.image_size )
-        # y_index = np.random.randint(0, x.shape[2] - self.image_size )
-        # my code
+        # # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
+        # # x_index = np.random.randint(0, x.shape[1] - self.image_size )
+        # # y_index = np.random.randint(0, x.shape[2] - self.image_size )
+        # # my code
         # x_index = np.random.randint(0, x.shape[1] - self.image_size + 1)
         # y_index = np.random.randint(0, x.shape[2] - self.image_size + 1)
 
@@ -439,16 +438,16 @@ class Kaggld_Dataset(Dataset):
         x = data['image']
         y = data['mask'] >= 127 # ratate时会出现大于127的值，即异常值
 
-        # if self.arg:
-        #     i = np.random.randint(4)
-        #     # x是3维，y是2维
-        #     x = x.rot90(i, dims=(1, 2))
-        #     y = y.rot90(i, dims=(0, 1))
-        #     for i in range(3):
-        #         if np.random.randint(2):
-        #             x = x.flip(dims=(i,))
-        #             if i >= 1:
-        #                 y = y.flip(dims=(i - 1,))
+        if self.arg:
+            i = np.random.randint(4)
+            # x是3维，y是2维
+            x = x.rot90(i, dims=(1, 2))
+            y = y.rot90(i, dims=(0, 1))
+            for i in range(3):
+                if np.random.randint(2):
+                    x = x.flip(dims=(i,))
+                    if i >= 1:
+                        y = y.flip(dims=(i - 1,))
 
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
