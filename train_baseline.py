@@ -83,7 +83,7 @@ class CFG:
     train_aug_list = [
         
         # A.Rotate(limit=45, p=0.5),  # 旋转
-        # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
         # A.RandomGamma(p=0.75),  # 随机Gamma变换
         # A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
@@ -327,8 +327,9 @@ def load_data(paths, is_label=False):
         
         # ============== 归一化 ===============
 
-        # 对数据进行最小-最大归一化，并将数据类型转换为uint8
-        x = (min_max_normalization(x.to(tc.float16)[None])[0] * 255).to(tc.uint8)
+        # # 对数据进行最小-最大归一化，并将数据类型转换为uint8
+        # x = (min_max_normalization(x.to(tc.float16)[None])[0] * 255).to(tc.uint8)
+        None
     
     return x # 返回处理后的数据张量
 
@@ -561,6 +562,7 @@ if __name__=='__main__':
     print("start the train!")
     best_score = 0.0
     best_valid = 999.0
+    avg_score = 0.0
     for epoch in range(CFG.epochs):
 
         # =============== train ===============
@@ -575,7 +577,7 @@ if __name__=='__main__':
             y = y.cuda().to(tc.float32)
             
             # 数据预处理
-            # x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
+            x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
             # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True)
             
             # 使用自动混合精度进行前向传播和损失计算
@@ -628,6 +630,9 @@ if __name__=='__main__':
             val_scores = (val_scores * i + score) / (i + 1)
             
         print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
+        
+        if epoch>=10:
+            avg_score = avg_score + val_scores
 
         if val_scores > best_score:
             best_score = val_scores
@@ -638,3 +643,6 @@ if __name__=='__main__':
             best_valid = val_losss
             # tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
             tc.save(model.module.state_dict(), "./best_loss.pt")
+    
+    print("10-19 epoch avg score: ", avg_score/10)
+
