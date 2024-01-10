@@ -81,17 +81,21 @@ class CFG:
 
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
+        # useless
+        # A.RandomGamma(p=0.75),  # 随机Gamma变换
+        
+
         
         # A.Rotate(limit=45, p=0.5),  # 旋转
-        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+        # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
-        # A.RandomGamma(p=0.75),  # 随机Gamma变换
+        
         # A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
         # A.GaussianBlur(p=0.5),  # 高斯模糊
         # A.MotionBlur(p=0.5),  # 运动模糊
-        # A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
+        A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
         
-
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
@@ -563,6 +567,7 @@ if __name__=='__main__':
     best_score = 0.0
     best_valid = 999.0
     avg_score = 0.0
+    avg_train_score = 0.0
     for epoch in range(CFG.epochs):
 
         # =============== train ===============
@@ -603,7 +608,9 @@ if __name__=='__main__':
             
             # 释放显存
             del loss, pred
-            
+        
+        if epoch>=10:
+                avg_train_score = avg_train_score + scores
         # =============== validation ===============
 
         model.eval()
@@ -644,5 +651,5 @@ if __name__=='__main__':
             # tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
             tc.save(model.module.state_dict(), "./best_loss.pt")
     
-    print("10-19 epoch avg score: ", avg_score/10)
-
+    print("10-19 epoch avg vaild score: ", avg_score/10)
+    print("10-19 epoch avg train score: ", avg_train_score/10)
