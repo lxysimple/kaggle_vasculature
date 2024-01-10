@@ -97,8 +97,8 @@ class CFG:
         # A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
         
         # my code
-        A.Transpose(always_apply=False, p=0.5), # 通过交换行和列来转置输入
-        # A.RandomGridShuffle(grid=(3, 3), always_apply=False, p=0.5), # 随机网格洗牌
+        # A.Transpose(always_apply=False, p=0.5), # 通过交换行和列来转置输入
+        A.RandomGridShuffle(grid=(3, 3), always_apply=False, p=0.5), # 随机网格洗牌
         # InvertImg(always_apply=False, p=0.5), # 通过从255减去像素值来反转输入图像
         # A.GaussNoise(var_limit=(10.0, 50.0), mean=None, always_apply=False, p=0.5), # 高斯噪声
         # A.Cutout(num_holes=8, max_h_size=8, max_w_size=8, fill_value=0, always_apply=False, p=0.5), # 在图像中生成正方形区域
