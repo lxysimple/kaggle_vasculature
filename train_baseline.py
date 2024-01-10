@@ -85,7 +85,6 @@ class CFG:
         # A.RandomGamma(p=0.75),  # 随机Gamma变换
         
 
-        
         # A.Rotate(limit=45, p=0.5),  # 旋转
         # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
 
@@ -96,29 +95,21 @@ class CFG:
         # A.MotionBlur(p=0.5),  # 运动模糊
         # A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
         
-        # my code
+        # # my code
         # A.Transpose(always_apply=False, p=0.5), # 通过交换行和列来转置输入
-        A.RandomGridShuffle(grid=(3, 3), always_apply=False, p=0.5), # 随机网格洗牌
-        # InvertImg(always_apply=False, p=0.5), # 通过从255减去像素值来反转输入图像
-        # A.GaussNoise(var_limit=(10.0, 50.0), mean=None, always_apply=False, p=0.5), # 高斯噪声
-        # A.Cutout(num_holes=8, max_h_size=8, max_w_size=8, fill_value=0, always_apply=False, p=0.5), # 在图像中生成正方形区域
+        # A.RandomGridShuffle(grid=(3, 3), always_apply=False, p=0.5), # 随机网格洗牌
+        # A.InvertImg(always_apply=False, p=0.5), # 通过从255减去像素值来反转输入图像
+        A.Cutout(num_holes=8, max_h_size=8, max_w_size=8, fill_value=0, always_apply=False, p=0.5), # 在图像中生成正方形区域
 
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
     valid_aug_list = [
-        # my code
-        # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
-        
+        # 注意这个不是整张图片，而是在随机裁剪的图片上做验证的
         A.RandomCrop(input_size, input_size, p=1),  
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
-
-    # # my code
-    # my_aug = A.Compose([A.Resize(height=1920, width=1920),])
-
-# ============================ global configure ============================
 
 # ============================ the model ============================
     
