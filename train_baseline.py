@@ -98,8 +98,8 @@ class CFG:
     valid_aug_list = [
         # my code
         # A.PadIfNeeded(min_height=input_size, min_width=input_size, border_mode=0, always_apply=True),
-        # A.RandomCrop(input_size, input_size, p=1),  
-
+        
+        A.RandomCrop(input_size, input_size, p=1),  
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
@@ -560,7 +560,7 @@ if __name__=='__main__':
 
     print("start the train!")
     best_score = 0.0
-    best_valid = 0.0
+    best_valid = 999.0
     for epoch in range(CFG.epochs):
 
         # =============== train ===============
@@ -606,7 +606,7 @@ if __name__=='__main__':
 
         model.eval()
         
-        val_losss = 99999
+        val_losss = 0
         val_scores = 0
         
         for i, (x, y) in enumerate(val_dataset):
