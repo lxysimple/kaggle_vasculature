@@ -60,7 +60,7 @@ class CFG:
 #                "/kaggle/input/sn-hoa-8e-5-27-rot0-5/se_resnext50_32x4d_30_loss0.10_score0.90_val_loss0.13_val_score0.88_midd_1024.pt"]#  31 8e 05  
 
     model_path=[
-        "/kaggle/input/kidney/se_resnext50_32x4d_19_loss0.17_score0.83_val_loss0.10_val_score0.86.pt",
+        "/root/xy/se_resnext50_32x4d_19_loss0.17_score0.83_val_loss0.10_val_score0.86.pt",
     ]
 
 
@@ -338,7 +338,7 @@ def get_output(debug=False):
     if debug:
         paths = [
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_2",
-            "/kaggle/input/blood-vessel-segmentation/train/kidney_3_sparse",
+            "/root/xy/train/kidney_3_sparse",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_dense",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_voi",
             
@@ -545,7 +545,7 @@ if __name__=='__main__':
 
 
     # 检查是否要提交，如果测试集图片数量不等于3，is_submit为True
-    is_submit = len(glob("/kaggle/input/blood-vessel-segmentation/test/kidney_5/images/*.tif")) != 3
+    is_submit = len(glob("/root/xy/test/kidney_5/images/*.tif")) != 3
 
     # is_submit=True # 手动规定提交模式
 
@@ -628,7 +628,7 @@ if __name__=='__main__':
     submission_df = pd.concat(submission_df)
     submission_df.to_csv('submission.csv', index=False)
 
-    gt_df = pd.read_csv("/kaggle/input/sennet-hoa-gt-data/gt.csv")
+    gt_df = pd.read_csv("/root/xy/gt.csv")
 
     
     # to align labels 
