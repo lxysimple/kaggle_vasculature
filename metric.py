@@ -12,7 +12,7 @@ import pandas as pd  # 导入Pandas库并重命名为pd
 import segmentation_models_pytorch as smp  # 导入分割模型PyTorch库并重命名为smp
 from torch.utils.data import Dataset, DataLoader  # 导入PyTorch的数据集和数据加载工具
 from torch.nn.parallel import DataParallel  # 导入PyTorch的数据并行工具DataParallel
-from dotenv import load_dotenv  # 导入dotenv库用于加载环境变量
+
 
 import copy
 
@@ -338,7 +338,7 @@ def get_output(debug=False):
     if debug:
         paths = [
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_2",
-            "/root/xy/train/kidney_3_sparse",
+            "/root/autodl-tmp/train/kidney_3_sparse",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_dense",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_voi",
             
@@ -351,6 +351,7 @@ def get_output(debug=False):
 
     # 遍历所有路径
     for path in paths:
+        print(path)
         # x.shape=(count, h, w)
         x = load_data(path, "/images/") 
         
@@ -545,12 +546,14 @@ if __name__=='__main__':
 
 
     # 检查是否要提交，如果测试集图片数量不等于3，is_submit为True
-    is_submit = len(glob("/root/xy/test/kidney_5/images/*.tif")) != 3
+    is_submit = len(glob("/root/autodl-tmp/test/kidney_5/images/*.tif")) != 3
 
     # is_submit=True # 手动规定提交模式
 
     # 对列表解包, 进行推理
     output, ids, shapes = get_output(not is_submit)
+
+
 
     # # 计算阈值
     # TH = [x.flatten().numpy() for x in output]
