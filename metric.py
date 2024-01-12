@@ -114,7 +114,7 @@ class CustomModel(nn.Module):
 
         
         # 4个图片shape=[b, c, h, w]，这里裁剪是正方形，所以怎么旋转尺寸都不变
-        x_flips = 4
+        x_flips = 1
         x = [tc.rot90(x, k=i, dims=(-2, -1)) for i in range(x_flips)]  # 将输入进行四次旋转
         x = tc.cat(x, dim=0)
       
@@ -124,8 +124,9 @@ class CustomModel(nn.Module):
                 # forward_(x[0:b]), forward_(x[b:2b]), ...
                 # +1是为了末尾如果剩了一点样本，就也放入模型进行预测
                 # res_x = [(b, 1, h, w), ...]
-                x = [self.forward_(x[i * self.batch: (i + 1) * self.batch]) for i in range(x.shape[0] // self.batch + 1)]
-                
+                # x = [self.forward_(x[i * self.batch: (i + 1) * self.batch]) for i in range(x.shape[0] // self.batch + 1)]
+                x = [self.forward_(x[i * shape[0]: (i + 1) * shape[0]]) for i in range(x_flips)]
+
                 # x shape=(4, h, w)
                 x = tc.cat(x, dim=0)
 
@@ -141,8 +142,11 @@ class CustomModel(nn.Module):
         # x:  torch.Size([4, 80, 512, 512])
         x = [tc.rot90(x[i], k=-i, dims=(-2, -1)) for i in range(x_flips)]  # 将结果进行逆时针旋转回正方向
 
-        # [80, 512, 512]
+    
+        # [x_flips, 80, 512, 512]->[80, 512, 512]
         x = tc.stack(x, dim=0).mean(0)  # 取四个方向的平均值
+
+  
         # my code
         x = tc.unsqueeze(x, dim=1) # [80, 1, 512, 512]
         # print("x: ", x.shape)
@@ -374,8 +378,8 @@ def get_output(debug=False):
         
         # my code
         # in_chanels时，最少要3个样本，因为2个样本就会被3个空白样本所投输
-        x = x[0:400]
-        mark = mark[0:400]
+        x = x[0:10]
+        mark = mark[0:10]
         labels = tc.zeros_like(x, dtype=tc.uint8)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式

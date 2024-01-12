@@ -132,6 +132,7 @@ class CustomModel(nn.Module):
                 x = self.forward_(x)
         
         x = x.sigmoid()  # 对输出进行sigmoid激活
+
         
 #         x = x.reshape(4, shape[0], *shape[2:])
 #         x = [tc.rot90(x[i], k=-i, dims=(-2, -1)) for i in range(4)]  # 将结果进行逆时针旋转回正方向
@@ -503,7 +504,8 @@ def get_output(debug=False):
 
                 # my code 
                 # 取消阈值
-                labels_[index] += (mask_pred[0] * CFG.axis_w[axis]).to(tc.uint8).cpu()
+                # mask_pred.shape = [1, 1041, 1511]
+                labels_[index] += (mask_pred[0]>0.4).to(tc.uint8).cpu()
 
 #                 # 如果处于调试模式，则显示图像及预测掩码
 #                 # 明明img[0, CFG.in_chans // 2].shape = mask_pred[0].shape，图显示就是不一样大，气死了
@@ -582,9 +584,11 @@ if __name__=='__main__':
             else:
                 break
         
-    #     # 获取预测的血管掩码
-    #     # output[i][index]: 即某张切片的预测mask
-    #     mask_pred = (output[i][index] >= TH).numpy()
+        # # 获取预测的血管掩码
+        # # output[i][index]: 即某张切片的预测mask
+        # # mask_pred = (output[i][index] >= TH).numpy()
+        # # my code
+        # mask_pred = (output[i][index] >= 0.4).numpy()
 
         # my code
         mask_pred = output[i][index].numpy()
