@@ -378,8 +378,9 @@ def get_output(debug=False):
         
         # my code
         # in_chanels时，最少要3个样本，因为2个样本就会被3个空白样本所投输
-        x = x[0:10]
-        mark = mark[0:10]
+        # 最少要32+1个样本,不然没法切
+        x = x[0:33]
+        mark = mark[0:33]
         labels = tc.zeros_like(x, dtype=tc.uint8)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
@@ -418,7 +419,7 @@ def get_output(debug=False):
             if min_wh < CFG.tile_size:
                 # make sure that it can be divided by 32
                 CFG.tile_size = min_wh // 32 * 32
-    
+            # print(CFG.tile_size)
     
             # my code
             # 计算切片开始切的坐标
@@ -476,6 +477,7 @@ def get_output(debug=False):
 
                 # tc.cat(chip).shape = torch.Size([80, 5, 512, 512])
                 # y_preds.shape = torch.Size([40, 1, 512, 512])
+                # print("tc.cat(chip): ", tc.cat(chip).shape)
                 y_preds = model.forward(tc.cat(chip)).to(device=0)
 
 #                 # my code
@@ -511,7 +513,7 @@ def get_output(debug=False):
                 # labels_[index] += (mask_pred[0] * 255 * CFG.axis_w[axis]).to(tc.uint8).cpu()
                 labels_[index] += (mask_pred[0]*0.33333).to(tc.uint8).cpu()
                 if axis == 2: # 最后的时候将概率转化为0/1
-                    labels_[index] = (labels_[index] > 0.4)
+                    labels_[index] = (mask_pred[0] > 0.4).to(tc.uint8).cpu()
 
                 # # my code 
                 # # 取消阈值
@@ -527,7 +529,8 @@ def get_output(debug=False):
 #                 plt.imshow(mask_pred[0].cpu().detach().numpy())
 #                 plt.show()
                     
-
+            # 有缺陷，应该保存每一个轴切出label的结果，共3个结果，最后在这里相加
+                    
     
         # 将标签和标记添加到输出列表
         outputs[0].append(labels)
