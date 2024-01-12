@@ -374,8 +374,8 @@ def get_output(debug=False):
         
         # my code
         # in_chanels时，最少要3个样本，因为2个样本就会被3个空白样本所投输
-        x = x[600:610]
-        mark = mark[600:610]
+        x = x[0:400]
+        mark = mark[0:400]
         labels = tc.zeros_like(x, dtype=tc.uint8)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
