@@ -91,12 +91,13 @@ class CustomModel(nn.Module):
         return output
 
     def forward(self, x: tc.Tensor):
-        # x.shape=(batch, c, h, w), [80, 5, 512, 512]
+        # x.shape=(batch, c, h, w)
+        
         # 转换为float32类型
         x = x.to(tc.float32)
         
         # 对输入数据进行归一化处理
-        # 必须要有，否则模型无法推理
+        # 必须要有，否则模型推理
         x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
         
 #         # 若输入尺寸不同，则进行双线性插值调整
@@ -113,39 +114,28 @@ class CustomModel(nn.Module):
 #         resized_image = image.resize((CFG.input_size, CFG.input_size), Image.ANTIALIAS)
 
         
-        # 4个图片shape=[b, c, h, w]，这里裁剪是正方形，所以怎么旋转尺寸都不变
-        x_flips = 4
-        x = [tc.rot90(x, k=i, dims=(-2, -1)) for i in range(x_flips)]  # 将输入进行四次旋转
-        x = tc.cat(x, dim=0)
-      
+#         # [b, c, h, w] -> [4*b, c, h, w]
+#         x = [tc.rot90(x, k=i, dims=(-2, -1)) for i in range(4)]  # 将输入进行四次旋转
+#         x = tc.cat(x, dim=0)
         
         with autocast():
             with tc.no_grad():
-                # forward_(x[0:b]), forward_(x[b:2b]), ...
-                # +1是为了末尾如果剩了一点样本，就也放入模型进行预测
-                # res_x = [(b, 1, h, w), ...]
-                x = [self.forward_(x[i * self.batch: (i + 1) * self.batch]) for i in range(x.shape[0] // self.batch + 1)]
+#                 # forward_(x[0:b]), forward_(x[b:2b]), ...
+#                 # why +1?
+#                 # x = [(h, w), ...]
+#                 x = [self.forward_(x[i * self.batch: (i + 1) * self.batch]) for i in range(x.shape[0] // self.batch + 1)]
                 
-                # x shape=(4, h, w)
-                x = tc.cat(x, dim=0)
+#                 # x shape=(4, h, w)
+#                 x = tc.cat(x, dim=0)
 
-                # # my code
-                # x = self.forward_(x)
+                # my code
+                x = self.forward_(x)
         
         x = x.sigmoid()  # 对输出进行sigmoid激活
         
-        # 将x分为4个一组（因为之前通过旋转，一张图变成4张图）
-        # shape[0]是原图片batchsize
-        x = x.reshape(x_flips, shape[0], *shape[2:])
-
-        # x:  torch.Size([4, 80, 512, 512])
-        x = [tc.rot90(x[i], k=-i, dims=(-2, -1)) for i in range(x_flips)]  # 将结果进行逆时针旋转回正方向
-
-        # [80, 512, 512]
-        x = tc.stack(x, dim=0).mean(0)  # 取四个方向的平均值
-        # my code
-        x = tc.unsqueeze(x, dim=1) # [80, 1, 512, 512]
-        # print("x: ", x.shape)
+#         x = x.reshape(4, shape[0], *shape[2:])
+#         x = [tc.rot90(x[i], k=-i, dims=(-2, -1)) for i in range(4)]  # 将结果进行逆时针旋转回正方向
+#         x = tc.stack(x, dim=0).mean(0)  # 取四个方向的平均值
         
 #         # 放缩回原图片大小
 #         if CFG.input_size != CFG.image_size:
@@ -155,7 +145,7 @@ class CustomModel(nn.Module):
           # 有病的规则，forward返回结果尺寸必须和forward接受结果一致
 #         x = nn.functional.interpolate(x[None], size=shape, mode='bilinear', align_corners=True)[0]   
         
-        # [40, 1, 512, 512]
+        # return x:  torch.Size([40, 1, 512, 512])
         return x
 
 
@@ -348,9 +338,10 @@ def get_output(debug=False):
     if debug:
         paths = [
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_2",
-            "/root/autodl-tmp/train/kidney_3_sparse",
+            # "/root/autodl-tmp/train/kidney_3_sparse",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_dense",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_voi",
+            "/root/autodl-tmp/train/kidney_3_dense",
             
 #             "/kaggle/input/blood-vessel-segmentation/test/kidney_5/"
         ]      
@@ -371,12 +362,15 @@ def get_output(debug=False):
         # [kidney_5_0000, ...] of x
         dataset_1kidney = Pipeline_Dataset(x, path)
         mark = dataset_1kidney.get_marks()
-        
+
+
         # my code
         # in_chanels时，最少要3个样本，因为2个样本就会被3个空白样本所投输
-        x = x[600:610]
-        mark = mark[600:610]
+        # 正样本太少评分函数是nan，故取0-400，正样本比较多
+        x = x[0:400]
+        mark = mark[0:400]
         labels = tc.zeros_like(x, dtype=tc.uint8)
+
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
 #         for axis in [0, 1, 2]:
@@ -434,7 +428,7 @@ def get_output(debug=False):
             print("start the inference!")
             for img, index in tqdm(dataloader):
 #                 # img.shape:  torch.Size([1, 5, 1041, 1511])
-#                 print("img.shape ", img.shape)
+                # print("img.shape ", img.shape)
 
                 # 将图像移动到GPU
                 img = img.to("cuda:0")
@@ -495,7 +489,7 @@ def get_output(debug=False):
                 
                 # 某些区域重合会多加,这里计算每个像素被计算了多少次,求均值
                 # mask_pred.shape = [1, 1041, 1511]
-                # 感觉是整数除法，有点投票的感觉
+                # 感觉是整数除法，有点投票的感觉    
                 mask_pred /= mask_count 
 
 #                 # 恢复预测掩码的边缘像素
