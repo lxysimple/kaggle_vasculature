@@ -381,6 +381,7 @@ def get_output(debug=False):
         labels = tc.zeros_like(x, dtype=tc.uint8) # (count, h, w)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
+        # 当z轴过小时，效果极差
         # for axis in [0, 1, 2]:
         for axis in [0]: # my code
 
@@ -537,7 +538,7 @@ def get_output(debug=False):
             mask_list = mask_list > 0.4 # float -> bool
             labels += mask_list.to(tc.uint8).cpu() 
                  
-        labels = labels >= 1 # 有2个投票才行
+        labels = labels >= 1 # 1 2 # 有2个投票才行
         # 将标签和标记添加到输出列表
         outputs[0].append(labels)
         outputs[1].extend(mark)
