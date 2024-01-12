@@ -513,7 +513,7 @@ def get_output(debug=False):
 
                 # my code 
                 # 取消阈值
-                labels_[index] += (mask_pred[0] * CFG.axis_w[axis]).to(tc.uint8).cpu()
+                labels_[index] += (mask_pred[0] > 0.4).to(tc.uint8).cpu()
 
 #                 # 如果处于调试模式，则显示图像及预测掩码
 #                 # 明明img[0, CFG.in_chans // 2].shape = mask_pred[0].shape，图显示就是不一样大，气死了
