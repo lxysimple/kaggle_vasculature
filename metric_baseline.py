@@ -399,7 +399,8 @@ def get_output(debug=False):
             dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
             
             # 获取数据集的形状
-            shape = dataset.x.shape[-2:]
+            # shape = dataset.x.shape[-2:]
+            shape = x_.shape[-2:] # shape是当前轴切除的某一个肺数据集shape
 
 #             # 计算切片的坐标范围
 #             x1_list = np.arange(0, shape[0] + CFG.tile_size - CFG.tile_size + 1, CFG.stride)

@@ -258,7 +258,7 @@ def load_data(path,s):
 #     TH:int = np.partition(TH, -index)[-index]
 #     x[x<TH]=int(TH)
 
-#     x=(min_max_normalization(x.to(tc.float16))*255).to(tc.uint8)
+    # x=(min_max_normalization(x.to(tc.float16))*255).to(tc.uint8)
     return x
 
 class Pipeline_Dataset(Dataset):
@@ -383,9 +383,8 @@ def get_output(debug=False):
         labels = tc.zeros_like(x, dtype=tc.uint8)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
-#         for axis in [0, 1, 2]:
-        for axis in [0]: # my code
-            debug_count = 0
+        for axis in [0, 1, 2]:
+        # for axis in [0]: # my code
 
             if axis == 0:
                 x_ = x
@@ -408,17 +407,17 @@ def get_output(debug=False):
             dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
             
             # 获取数据集的形状
-            shape = dataset.x.shape[-2:]
+            shape = x_.shape[-2:] # shape是当前轴切除的某一个肺数据集shape
 
 #             # 计算切片的坐标范围
 #             x1_list = np.arange(0, shape[0] + CFG.tile_size - CFG.tile_size + 1, CFG.stride)
 #             y1_list = np.arange(0, shape[1] + CFG.tile_size - CFG.tile_size + 1, CFG.stride)
             
-#             # my code, to avoid errors in cutting
-#             min_wh = min(shape[0], shape[1])
-#             if min_wh < CFG.tile_size:
-#                 # make sure that it can be divided by 32
-#                 CFG.tile_size = min_wh // 32 * 32
+            # my code, to avoid errors in cutting
+            min_wh = min(shape[0], shape[1])
+            if min_wh < CFG.tile_size:
+                # make sure that it can be divided by 32
+                CFG.tile_size = min_wh // 32 * 32
     
     
             # my code
@@ -507,13 +506,16 @@ def get_output(debug=False):
 #                 mask_pred = mask_pred[..., CFG.tile_size // 2:-CFG.tile_size // 2,
 #                                        CFG.tile_size // 2:-CFG.tile_size // 2]
 
-#                 # 更新标签
-#                 # 预测的只是每个像素的概率，最后TH貌似就是255
-#                 labels_[index] += (mask_pred[0] * 255 * CFG.axis_w[axis]).to(tc.uint8).cpu()
+                # 更新标签
+                # 预测的只是每个像素的概率，最后TH貌似就是255
+                # labels_[index] += (mask_pred[0] * 255 * CFG.axis_w[axis]).to(tc.uint8).cpu()
+                labels_[index] += (mask_pred[0]*0.33333).to(tc.uint8).cpu()
+                if axis == 2: # 最后的时候将概率转化为0/1
+                    labels_[index] = (labels_[index] > 0.4)
 
-                # my code 
-                # 取消阈值
-                labels_[index] += (mask_pred[0] > 0.4).to(tc.uint8).cpu()
+                # # my code 
+                # # 取消阈值
+                # labels_[index] += (mask_pred[0] > 0.4).to(tc.uint8).cpu()
 
 #                 # 如果处于调试模式，则显示图像及预测掩码
 #                 # 明明img[0, CFG.in_chans // 2].shape = mask_pred[0].shape，图显示就是不一样大，气死了
