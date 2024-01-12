@@ -248,15 +248,15 @@ def load_data(path,s):
         data.append(x)
     x=tc.cat(data,dim=0)
 
-#     TH=x.reshape(-1).numpy()
-#     index = -int(len(TH) * CFG.chopping_percentile)
-#     TH:int = np.partition(TH, index)[index]
-#     x[x>TH]=int(TH)
+    TH=x.reshape(-1).numpy()
+    index = -int(len(TH) * CFG.chopping_percentile)
+    TH:int = np.partition(TH, index)[index]
+    x[x>TH]=int(TH)
 
-#     TH=x.reshape(-1).numpy()
-#     index = -int(len(TH) * CFG.chopping_percentile)
-#     TH:int = np.partition(TH, -index)[-index]
-#     x[x<TH]=int(TH)
+    TH=x.reshape(-1).numpy()
+    index = -int(len(TH) * CFG.chopping_percentile)
+    TH:int = np.partition(TH, -index)[-index]
+    x[x<TH]=int(TH)
 
     # x=(min_max_normalization(x.to(tc.float16))*255).to(tc.uint8)
     return x
@@ -376,10 +376,10 @@ def get_output(debug=False):
         # my code
         # in_chanels时，最少要3个样本，因为2个样本就会被3个空白样本所投输
         # 最少要32+1个样本,不然没法切
-        x = x[0:400]
-        mark = mark[0:400]
         # x = x[0:33]
         # mark = mark[0:33]
+        x = x[0:400]
+        mark = mark[0:400]
         labels = tc.zeros_like(x, dtype=tc.uint8) # (count, h, w)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
@@ -416,17 +416,17 @@ def get_output(debug=False):
                 CFG.tile_size = min_wh // 32 * 32
             # print(CFG.tile_size)
     
-            # # my code
-            # # 计算切片开始切的坐标
-            # # stride=1, tile_size=2, shape[0]=3, => final index=3-2=1, =>arrange(0, 1+1=2)
-            # # x,y are the bad name
-            # x1_list = np.arange(0, shape[0] - CFG.tile_size , CFG.stride)
-            # y1_list = np.arange(0, shape[1] - CFG.tile_size , CFG.stride)
+            # my code
+            # 计算切片开始切的坐标
+            # stride=1, tile_size=2, shape[0]=3, => final index=3-2=1, =>arrange(0, 1+1=2)
+            # x,y are the bad name
+            x1_list = np.arange(0, shape[0] - CFG.tile_size , CFG.stride)
+            y1_list = np.arange(0, shape[1] - CFG.tile_size , CFG.stride)
 
             
-            # 故意多切图，+add_edge，=能够很好的处理边界
-            x1_list = np.arange(0, shape[0] + 1, CFG.stride) # 虽然最后切不全，但还是多了很多个数据
-            y1_list = np.arange(0, shape[1] + 1, CFG.stride)
+            # # 故意多切图，+add_edge，=能够很好的处理边界
+            # x1_list = np.arange(0, shape[0] + 1, CFG.stride) # 虽然最后切不全，但还是多了很多个数据
+            # y1_list = np.arange(0, shape[1] + 1, CFG.stride)
             
             print("start the inference!")
             mask_list = []
@@ -438,8 +438,8 @@ def get_output(debug=False):
                 img = img.to("cuda:0")
             
                 
-                # 在图像边缘添加像素, 我感觉[None]表示拷贝一份新的内存给img
-                img = add_edge(img[0], CFG.tile_size // 2)[None]
+                # # 在图像边缘添加像素, 我感觉[None]表示拷贝一份新的内存给img
+                # img = add_edge(img[0], CFG.tile_size // 2)[None]
 
                 # mask_pred是一整个切片的预测汇总图
                 # 选择第2维度上，第0个元素，其余维度不变
@@ -477,10 +477,10 @@ def get_output(debug=False):
 #                 # my code
 #                 y_preds = model.forward(img.to(device=0))
 
-                # # 如果指定了边缘像素数，则在预测中去掉边缘像素
-                # if CFG.drop_egde_pixel:
-                #     y_preds = y_preds[..., CFG.drop_egde_pixel:-CFG.drop_egde_pixel,
-                #                         CFG.drop_egde_pixel:-CFG.drop_egde_pixel]
+                # 不预测丢弃的像素
+                if CFG.drop_egde_pixel:
+                    y_preds = y_preds[..., CFG.drop_egde_pixel:-CFG.drop_egde_pixel,
+                                        CFG.drop_egde_pixel:-CFG.drop_egde_pixel]
 
                 # 遍历预测结果并更新掩码及其计数
 #                 for i, (x1, x2, y1, y2) in enumerate(indexs):
@@ -497,10 +497,10 @@ def get_output(debug=False):
                 # 感觉是整数除法，有点投票的感觉
                 mask_pred /= mask_count 
 
-                # 去掉之前加的边缘
-                # tile_size // 2 是之前增加的边缘像素
-                mask_pred = mask_pred[..., CFG.tile_size // 2:-CFG.tile_size // 2,
-                                       CFG.tile_size // 2:-CFG.tile_size // 2]
+                # # 去掉之前加的边缘
+                # # tile_size // 2 是之前增加的边缘像素
+                # mask_pred = mask_pred[..., CFG.tile_size // 2:-CFG.tile_size // 2,
+                #                        CFG.tile_size // 2:-CFG.tile_size // 2]
                 
                 mask_list.append(mask_pred)
 
