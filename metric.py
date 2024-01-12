@@ -378,6 +378,8 @@ def get_output(debug=False):
         # 最少要32+1个样本,不然没法切
         x = x[0:400]
         mark = mark[0:400]
+        # x = x[0:33]
+        # mark = mark[0:33]
         labels = tc.zeros_like(x, dtype=tc.uint8) # (count, h, w)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
@@ -406,10 +408,6 @@ def get_output(debug=False):
             
             # 获取数据集的形状
             shape = x_.shape[-2:] # shape是当前轴切除的某一个肺数据集shape
-
-#             # 计算切片的坐标范围
-#             x1_list = np.arange(0, shape[0] + CFG.tile_size - CFG.tile_size + 1, CFG.stride)
-#             y1_list = np.arange(0, shape[1] + CFG.tile_size - CFG.tile_size + 1, CFG.stride)
             
             # my code, to avoid errors in cutting
             min_wh = min(shape[0], shape[1])
@@ -418,19 +416,17 @@ def get_output(debug=False):
                 CFG.tile_size = min_wh // 32 * 32
             # print(CFG.tile_size)
     
-            # my code
-            # 计算切片开始切的坐标
-            # stride=1, tile_size=2, shape[0]=3, => final index=3-2=1, =>arrange(0, 1+1=2)
-            # x,y are the bad name
-            x1_list = np.arange(0, shape[0] - CFG.tile_size , CFG.stride)
-            y1_list = np.arange(0, shape[1] - CFG.tile_size , CFG.stride)
+            # # my code
+            # # 计算切片开始切的坐标
+            # # stride=1, tile_size=2, shape[0]=3, => final index=3-2=1, =>arrange(0, 1+1=2)
+            # # x,y are the bad name
+            # x1_list = np.arange(0, shape[0] - CFG.tile_size , CFG.stride)
+            # y1_list = np.arange(0, shape[1] - CFG.tile_size , CFG.stride)
 
             
-            # 可能因为有新增的边缘
-#             x1_list = np.arange(0, shape[0] + 1, CFG.stride) # 虽然最后切不全，但还是多了很多个数据
-#             y1_list = np.arange(0, shape[1] + 1, CFG.stride)
-            
-            
+            # 故意多切图，+add_edge，=能够很好的处理边界
+            x1_list = np.arange(0, shape[0] + 1, CFG.stride) # 虽然最后切不全，但还是多了很多个数据
+            y1_list = np.arange(0, shape[1] + 1, CFG.stride)
             
             print("start the inference!")
             mask_list = []
@@ -442,8 +438,8 @@ def get_output(debug=False):
                 img = img.to("cuda:0")
             
                 
-#                 # 在图像边缘添加像素, 我感觉[None]表示拷贝一份新的内存给img
-#                 img = add_edge(img[0], CFG.tile_size // 2)[None]
+                # 在图像边缘添加像素, 我感觉[None]表示拷贝一份新的内存给img
+                img = add_edge(img[0], CFG.tile_size // 2)[None]
 
                 # mask_pred是一整个切片的预测汇总图
                 # 选择第2维度上，第0个元素，其余维度不变
@@ -481,10 +477,10 @@ def get_output(debug=False):
 #                 # my code
 #                 y_preds = model.forward(img.to(device=0))
 
-#                 # 如果指定了边缘像素数，则在预测中去掉边缘像素
-#                 if CFG.drop_egde_pixel:
-#                     y_preds = y_preds[..., CFG.drop_egde_pixel:-CFG.drop_egde_pixel,
-#                                         CFG.drop_egde_pixel:-CFG.drop_egde_pixel]
+                # # 如果指定了边缘像素数，则在预测中去掉边缘像素
+                # if CFG.drop_egde_pixel:
+                #     y_preds = y_preds[..., CFG.drop_egde_pixel:-CFG.drop_egde_pixel,
+                #                         CFG.drop_egde_pixel:-CFG.drop_egde_pixel]
 
                 # 遍历预测结果并更新掩码及其计数
 #                 for i, (x1, x2, y1, y2) in enumerate(indexs):
@@ -501,16 +497,12 @@ def get_output(debug=False):
                 # 感觉是整数除法，有点投票的感觉
                 mask_pred /= mask_count 
 
-#                 # 恢复预测掩码的边缘像素
-#                 # tile_size // 2 是之前增加的边缘像素
-#                 mask_pred = mask_pred[..., CFG.tile_size // 2:-CFG.tile_size // 2,
-#                                        CFG.tile_size // 2:-CFG.tile_size // 2]
-                mask_list.append(mask_pred)
+                # 去掉之前加的边缘
+                # tile_size // 2 是之前增加的边缘像素
+                mask_pred = mask_pred[..., CFG.tile_size // 2:-CFG.tile_size // 2,
+                                       CFG.tile_size // 2:-CFG.tile_size // 2]
                 
-
-                # # my code 
-                # # 取消阈值
-                # labels_[index] += (mask_pred[0] > 0.4).to(tc.uint8).cpu()
+                mask_list.append(mask_pred)
 
 #                 # 如果处于调试模式，则显示图像及预测掩码
 #                 # 明明img[0, CFG.in_chans // 2].shape = mask_pred[0].shape，图显示就是不一样大，气死了
@@ -526,9 +518,6 @@ def get_output(debug=False):
                 # # 更新标签
                 # # 预测的只是每个像素的概率，最后TH貌似就是255
                 # # labels_[index] += (mask_pred[0] * 255 * CFG.axis_w[axis]).to(tc.uint8).cpu()
-                # labels_[index] += (mask_pred[0]*0.33333).to(tc.uint8).cpu()
-                # if axis == 2: # 最后的时候将概率转化为0/1
-                #     labels_[index] = (mask_pred[0] > 0.4).to(tc.uint8).cpu() 
                 
             mask_list = tc.cat(mask_list, dim=0) # [1, 1041, 1511]-> [cuts, 1041, 1511]
             if axis == 1:
