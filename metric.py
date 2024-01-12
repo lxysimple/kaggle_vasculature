@@ -352,10 +352,10 @@ def get_output(debug=False):
     if debug:
         paths = [
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_2",
-            "/root/autodl-tmp/train/kidney_3_sparse",
+            # "/root/autodl-tmp/train/kidney_3_sparse",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_dense",
 #             "/kaggle/input/blood-vessel-segmentation/train/kidney_1_voi",
-            
+            "/root/autodl-tmp/train/kidney_3_dense",
 #             "/kaggle/input/blood-vessel-segmentation/test/kidney_5/"
         ]      
         
