@@ -248,15 +248,16 @@ def load_data(path,s):
         data.append(x)
     x=tc.cat(data,dim=0)
 
-    TH=x.reshape(-1).numpy()
-    index = -int(len(TH) * CFG.chopping_percentile)
-    TH:int = np.partition(TH, index)[index]
-    x[x>TH]=int(TH)
+    # # 我感觉是去除噪音和无关背景
+    # TH=x.reshape(-1).numpy()
+    # index = -int(len(TH) * CFG.chopping_percentile)
+    # TH:int = np.partition(TH, index)[index]
+    # x[x>TH]=int(TH)
 
-    TH=x.reshape(-1).numpy()
-    index = -int(len(TH) * CFG.chopping_percentile)
-    TH:int = np.partition(TH, -index)[-index]
-    x[x<TH]=int(TH)
+    # TH=x.reshape(-1).numpy()
+    # index = -int(len(TH) * CFG.chopping_percentile)
+    # TH:int = np.partition(TH, -index)[-index]
+    # x[x<TH]=int(TH)
 
     # x=(min_max_normalization(x.to(tc.float16))*255).to(tc.uint8)
     return x
@@ -376,10 +377,10 @@ def get_output(debug=False):
         # my code
         # in_chanels时，最少要3个样本，因为2个样本就会被3个空白样本所投输
         # 最少要32+1个样本,不然没法切
-        # x = x[0:33]
-        # mark = mark[0:33]
-        x = x[0:400]
-        mark = mark[0:400]
+        x = x[0:33]
+        mark = mark[0:33]
+        # x = x[0:400]
+        # mark = mark[0:400]
         labels = tc.zeros_like(x, dtype=tc.uint8) # (count, h, w)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
