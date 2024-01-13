@@ -55,7 +55,7 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 20 # 20/40  # 训练轮数
+    epochs = 40 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
  
@@ -145,12 +145,12 @@ def build_model(weight="imagenet"):
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
-    # 构建并返回模型
-    model = CustomModel(CFG, weight)
+    # # 构建并返回模型
+    # model = CustomModel(CFG, weight)
 
-    # # my code
-    # model = CustomModel(CFG, None)
-    # model.load_state_dict(tc.load('/root/xy/se_resnext50_32x4d-a260b3a4.pth'))
+    # my code
+    model = CustomModel(CFG, None)
+    model.load_state_dict(tc.load('/root/xy/best_loss.pt'))
 
     return model.cuda()
 
