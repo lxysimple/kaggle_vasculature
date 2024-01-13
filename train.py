@@ -40,7 +40,8 @@ class CFG:
 
     # ============== 模型配置 =============
     model_name = 'Unet'
-    backbone = 'se_resnext50_32x4d'
+    # backbone = 'se_resnext50_32x4d'
+    backbone = 'se_resnext101_32x4d'
 
     in_chans = 5 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 

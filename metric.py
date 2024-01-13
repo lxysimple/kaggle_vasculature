@@ -385,8 +385,8 @@ def get_output(debug=False):
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
         # 当z轴过小时，效果极差
-        # axis_list = [0, 1, 2]
-        axis_list = [0]
+        axis_list = [0, 1, 2]
+        # axis_list = [0]
         for axis in axis_list: # my code
 
             if axis == 0:
