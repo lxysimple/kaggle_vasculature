@@ -379,8 +379,8 @@ def get_output(debug=False):
         # 最少要32+1个样本,不然没法切
         # x = x[0:33]
         # mark = mark[0:33]
-        x = x[0:400]
-        mark = mark[0:400]
+        # x = x[0:400]
+        # mark = mark[0:400]
         labels = tc.zeros_like(x, dtype=tc.uint8) # (count, h, w)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
