@@ -114,7 +114,7 @@ class CustomModel(nn.Module):
 
         
         # 4个图片shape=[b, c, h, w]，这里裁剪是正方形，所以怎么旋转尺寸都不变
-        x_flips = 1
+        x_flips = 4 # 控制旋转次数
         x = [tc.rot90(x, k=i, dims=(-2, -1)) for i in range(x_flips)]  # 将输入进行四次旋转
         x = tc.cat(x, dim=0)
       
@@ -248,16 +248,16 @@ def load_data(path,s):
         data.append(x)
     x=tc.cat(data,dim=0)
 
-    # # 我感觉是去除噪音和无关背景
-    # TH=x.reshape(-1).numpy()
-    # index = -int(len(TH) * CFG.chopping_percentile)
-    # TH:int = np.partition(TH, index)[index]
-    # x[x>TH]=int(TH)
+    # 我感觉是去除噪音和无关背景
+    TH=x.reshape(-1).numpy()
+    index = -int(len(TH) * CFG.chopping_percentile)
+    TH:int = np.partition(TH, index)[index]
+    x[x>TH]=int(TH)
 
-    # TH=x.reshape(-1).numpy()
-    # index = -int(len(TH) * CFG.chopping_percentile)
-    # TH:int = np.partition(TH, -index)[-index]
-    # x[x<TH]=int(TH)
+    TH=x.reshape(-1).numpy()
+    index = -int(len(TH) * CFG.chopping_percentile)
+    TH:int = np.partition(TH, -index)[-index]
+    x[x<TH]=int(TH)
 
     # x=(min_max_normalization(x.to(tc.float16))*255).to(tc.uint8)
     return x
@@ -385,8 +385,9 @@ def get_output(debug=False):
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
         # 当z轴过小时，效果极差
-        # for axis in [0, 1, 2]:
-        for axis in [0]: # my code
+        # axis_list = [0, 1, 2]
+        axis_list = [0]
+        for axis in axis_list: # my code
 
             if axis == 0:
                 x_ = x
@@ -532,8 +533,9 @@ def get_output(debug=False):
                 
 
             labels += mask_list.to(tc.uint8).cpu() 
-                 
-        labels = labels >= 1 # 1 2 # 有2个投票才行
+
+        # 有2个投票才行
+        labels = labels >= (len(axis_list)+1)//2 # len=1 => 1, len=3 => 2 
             
         # 将标签和标记添加到输出列表
         outputs[0].append(labels)
@@ -608,8 +610,8 @@ if __name__=='__main__':
         # # output[i][index]: 即某张切片的预测mask
         # mask_pred = (output[i][index] >= TH).numpy()
 
-        # # my code
-        # mask_pred = output[i][index].numpy()
+        # my code
+        mask_pred = output[i][index].numpy()
         
         # 将掩码转换回原始大小
         # 这里可否用上采样或下采样呢

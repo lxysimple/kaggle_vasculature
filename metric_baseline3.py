@@ -377,10 +377,10 @@ def get_output(debug=False):
         # my code
         # in_chanels时，最少要3个样本，因为2个样本就会被3个空白样本所投输
         # 最少要32+1个样本,不然没法切
-        # x = x[0:33]
-        # mark = mark[0:33]
-        x = x[0:400]
-        mark = mark[0:400]
+        x = x[0:33]
+        mark = mark[0:33]
+        # x = x[0:400]
+        # mark = mark[0:400]
         labels = tc.zeros_like(x, dtype=tc.uint8) # (count, h, w)
 
         # 在三个轴上进行切片，不费内存，只改变索引方式
@@ -608,8 +608,8 @@ if __name__=='__main__':
         # # output[i][index]: 即某张切片的预测mask
         # mask_pred = (output[i][index] >= TH).numpy()
 
-        # # my code
-        # mask_pred = output[i][index].numpy()
+        # my code
+        mask_pred = output[i][index].numpy()
         
         # 将掩码转换回原始大小
         # 这里可否用上采样或下采样呢
