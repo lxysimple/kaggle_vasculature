@@ -134,6 +134,7 @@ class CustomModel(nn.Module):
         return output[:, 0]  # 选择输出的第一个通道，这里假设输出是多通道的sigmoid()
 
 # mv /home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth /home/xyli/.cache/torch/hub/checkpoints/
+# mv /home/.cache/torch/checkpoints/se_resnext101_32x4d-3b2fe3d8.pth /root/.cache/torch/hub/checkpoints/se_resnext101_32x4d-3b2fe3d8.pth
 def build_model(weight="imagenet"):
     # # 加载环境变量
     # load_dotenv()
