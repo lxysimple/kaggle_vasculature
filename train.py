@@ -559,7 +559,7 @@ if __name__=='__main__':
     print("start the train!")
     best_score = 0.0
     best_valid = 999.0
-    avg_score = 0.0
+ 
     avg_train_score = 0.0
     for epoch in range(CFG.epochs):
 
@@ -632,8 +632,6 @@ if __name__=='__main__':
         print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
         print()
 
-        if epoch>=10:
-            avg_score = avg_score + val_scores
 
         if val_scores > best_score:
             best_score = val_scores
@@ -645,5 +643,3 @@ if __name__=='__main__':
             tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
             # tc.save(model.module.state_dict(), "./best_loss.pt")
     
-    print("10-19 epoch avg vaild score: ", avg_score/10)
-    print("10-19 epoch avg train score: ", avg_train_score/10)
