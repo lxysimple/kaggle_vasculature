@@ -559,8 +559,6 @@ if __name__=='__main__':
     print("start the train!")
     best_score = 0.0
     best_valid = 999.0
- 
-    avg_train_score = 0.0
     for epoch in range(CFG.epochs):
 
         # =============== train ===============
@@ -602,8 +600,6 @@ if __name__=='__main__':
             # 释放显存
             del loss, pred
         
-        if epoch>=10:
-                avg_train_score = avg_train_score + scores
         # =============== validation ===============
 
         model.eval()
