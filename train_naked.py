@@ -445,16 +445,16 @@ class Kaggld_Dataset(Dataset):
         x = data['image']
         y = data['mask'] >= 127 # ratate时会出现大于127的值，即异常值
 
-        if self.arg:
-            i = np.random.randint(4)
-            # x是3维，y是2维
-            x = x.rot90(i, dims=(1, 2))
-            y = y.rot90(i, dims=(0, 1))
-            for i in range(3):
-                if np.random.randint(2):
-                    x = x.flip(dims=(i,))
-                    if i >= 1:
-                        y = y.flip(dims=(i - 1,))
+        # if self.arg:
+        #     i = np.random.randint(4)
+        #     # x是3维，y是2维
+        #     x = x.rot90(i, dims=(1, 2))
+        #     y = y.rot90(i, dims=(0, 1))
+        #     for i in range(3):
+        #         if np.random.randint(2):
+        #             x = x.flip(dims=(i,))
+        #             if i >= 1:
+        #                 y = y.flip(dims=(i - 1,))
 
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
