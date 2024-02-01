@@ -567,11 +567,11 @@ if __name__=='__main__':
     #     pct_start=0.1
     # )
 
-    # MultiStepLR 存在BUG
-    scheduler = tc.optim.lr_scheduler.StepLR(
+    scheduler = tc.optim.lr_scheduler.MultiStepLR(
         optimizer, 
-        step_size=20, 
+        milestones=[20,35], 
         gamma=0.1,
+        last_epoch=-1
     )
 
     # =============== define objects ===============
