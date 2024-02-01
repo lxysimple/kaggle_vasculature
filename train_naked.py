@@ -445,16 +445,16 @@ class Kaggld_Dataset(Dataset):
         x = data['image']
         y = data['mask'] >= 127 # ratate时会出现大于127的值，即异常值
 
-        # if self.arg:
-        #     i = np.random.randint(4)
-        #     # x是3维，y是2维
-        #     x = x.rot90(i, dims=(1, 2))
-        #     y = y.rot90(i, dims=(0, 1))
-        #     for i in range(3):
-        #         if np.random.randint(2):
-        #             x = x.flip(dims=(i,))
-        #             if i >= 1:
-        #                 y = y.flip(dims=(i - 1,))
+        if self.arg:
+            i = np.random.randint(4)
+            # x是3维，y是2维
+            x = x.rot90(i, dims=(1, 2))
+            y = y.rot90(i, dims=(0, 1))
+            for i in range(3):
+                if np.random.randint(2):
+                    x = x.flip(dims=(i,))
+                    if i >= 1:
+                        y = y.flip(dims=(i - 1,))
 
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
@@ -593,7 +593,7 @@ if __name__=='__main__':
             
             # 数据预处理
             x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
-            x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
+            # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
             # 使用自动混合精度进行前向传播和损失计算
             with autocast():
