@@ -48,11 +48,11 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 512 # 512/768/1024/1280/1536  # 图片大小 
-    input_size = 512 # 512/768/1024/1280/1536  # 输入尺寸
+    image_size = 1280 # 512/768/1024/1280/1536  # 图片大小 
+    input_size = 1280 # 512/768/1024/1280/1536  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 16 # 16 # 训练批量大小
+    train_batch_size = 2 # def=16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
@@ -85,22 +85,20 @@ class CFG:
     train_aug_list = [
         # useless
         # A.RandomGamma(p=0.75),  # 随机Gamma变换
-        
 
-        A.Rotate(limit=45, p=0.5),  # 旋转
-        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+        # my code
+        # 只有当input_size很大时才开启，这样随机裁剪就失效了
+        A.Resize(height=input_size, width=input_size, p=1),
+
+        # A.Rotate(limit=45, p=0.5),  # 旋转
+        # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
 
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
         
-        A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
-        A.GaussianBlur(p=0.5),  # 高斯模糊
-        A.MotionBlur(p=0.5),  # 运动模糊
-        A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
-        
-        # # my code
-        # A.Transpose(always_apply=False, p=0.5), # 通过交换行和列来转置输入
-        # A.RandomGridShuffle(grid=(3, 3), always_apply=False, p=0.5), # 随机网格洗牌
-        # A.InvertImg(always_apply=False, p=0.5), # 通过从255减去像素值来反转输入图像
+        # A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
+        # A.GaussianBlur(p=0.5),  # 高斯模糊
+        # A.MotionBlur(p=0.5),  # 运动模糊
+        # A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
         
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
@@ -547,6 +545,7 @@ if __name__=='__main__':
     # 使用AdamW优化器，传入模型参数和学习率
     optimizer = tc.optim.AdamW(model.parameters(), lr=CFG.lr)
 
+
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
     scaler = tc.cuda.amp.GradScaler()
 
@@ -561,8 +560,9 @@ if __name__=='__main__':
     # )
     scheduler = tc.optim.lr_scheduler.MultiStepLR(
         optimizer, 
-        milestones=[20,35,40], 
-        gamma=0.1
+        milestones=[20,35], 
+        gamma=0.1,
+        last_epoch=-1
     )
 
     # =============== define objects ===============
@@ -599,9 +599,9 @@ if __name__=='__main__':
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
-
+ 
             optimizer.zero_grad()
-            scheduler.step()
+            # scheduler.step()
             
             # 计算并更新平均损失和分数
             score = dice_coef(pred.detach(), y)
@@ -613,7 +613,9 @@ if __name__=='__main__':
             
             # 释放显存
             del loss, pred
-        
+
+        scheduler.step() # 不同的scheduler的优化单位不一样
+
         # =============== validation ===============
 
         model.eval()
