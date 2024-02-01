@@ -44,7 +44,7 @@ class CFG:
     backbone = 'se_resnext50_32x4d'
     # backbone = 'se_resnext101_32x4d'
 
-    in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
+    in_chans = 5 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
@@ -420,6 +420,9 @@ class Kaggld_Dataset(Dataset):
                 i += 1
             else:
                 break
+
+ 
+
         x = self.x[i] # 换到下一个肾数据集
         y = self.y[i]
             
@@ -438,7 +441,14 @@ class Kaggld_Dataset(Dataset):
         # my code
         x = x[index:index + self.in_chans, :, :]
         y = y[index + self.in_chans // 2, :, :]
-
+        
+        
+        # x = x[index:index + self.in_chans, :, :].clone()
+        # for i in range(0, self.in_chans-1):
+        #     if i != self.in_chans // 2:
+        #         x[self.in_chans // 2] += x[i+1] - x[i]
+        # x = x[self.in_chans // 2 : self.in_chans // 2+1, :, :]
+        # y = y[index + self.in_chans // 2, :, :]
 
         # 我感觉是为了与其他图像处理库或工具兼容，因为一些库（如 Matplotlib）期望图像的通道表示是 (H, W, C) 的形式
         data = self.transform(image=x.numpy().transpose(1, 2, 0), mask=y.numpy())
