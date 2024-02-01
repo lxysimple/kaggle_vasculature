@@ -554,12 +554,17 @@ if __name__=='__main__':
 
     # 使用OneCycleLR策略，单位:epoch
     # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
-    scheduler = tc.optim.lr_scheduler.OneCycleLR(
+    # scheduler = tc.optim.lr_scheduler.OneCycleLR(
+    #     optimizer, 
+    #     max_lr=CFG.lr,
+    #     steps_per_epoch=len(train_dataset), 
+    #     epochs=CFG.epochs+1,
+    #     pct_start=0.1
+    # )
+    scheduler = tc.optim.lr_scheduler.MultiStepLR(
         optimizer, 
-        max_lr=CFG.lr,
-        steps_per_epoch=len(train_dataset), 
-        epochs=CFG.epochs+1,
-        pct_start=0.1
+        milestones=[20,35,40], 
+        gamma=0.1
     )
 
     # =============== define objects ===============

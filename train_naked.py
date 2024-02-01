@@ -40,7 +40,9 @@ class CFG:
 
     # ============== 模型配置 =============
     model_name = 'Unet'
+
     backbone = 'se_resnext50_32x4d'
+    # backbone = 'se_resnext101_32x4d'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
@@ -54,7 +56,7 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 20 # 20/40  # 训练轮数
+    epochs = 40 # 20/40  # 训练轮数
     
     lr = 6e-5  # 学习率
  
@@ -85,15 +87,15 @@ class CFG:
         # A.RandomGamma(p=0.75),  # 随机Gamma变换
         
 
-        # A.Rotate(limit=45, p=0.5),  # 旋转
-        # A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+        A.Rotate(limit=45, p=0.5),  # 旋转
+        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
 
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
         
-        # A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
-        # A.GaussianBlur(p=0.5),  # 高斯模糊
-        # A.MotionBlur(p=0.5),  # 运动模糊
-        # A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
+        A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
+        A.GaussianBlur(p=0.5),  # 高斯模糊
+        A.MotionBlur(p=0.5),  # 运动模糊
+        A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
         
         # # my code
         # A.Transpose(always_apply=False, p=0.5), # 通过交换行和列来转置输入
@@ -550,12 +552,17 @@ if __name__=='__main__':
 
     # 使用OneCycleLR策略，单位:epoch
     # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
-    scheduler = tc.optim.lr_scheduler.OneCycleLR(
+    # scheduler = tc.optim.lr_scheduler.OneCycleLR(
+    #     optimizer, 
+    #     max_lr=CFG.lr,
+    #     steps_per_epoch=len(train_dataset), 
+    #     epochs=CFG.epochs+1,
+    #     pct_start=0.1
+    # )
+    scheduler = tc.optim.lr_scheduler.MultiStepLR(
         optimizer, 
-        max_lr=CFG.lr,
-        steps_per_epoch=len(train_dataset), 
-        epochs=CFG.epochs+1,
-        pct_start=0.1
+        milestones=[20,35,40], 
+        gamma=0.1
     )
 
     # =============== define objects ===============
