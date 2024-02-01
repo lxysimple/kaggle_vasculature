@@ -73,7 +73,7 @@ class CFG:
 
     chopping_percentile = 1e-3  # 切割百分比
 
-    data_root = '/home/xyli/kaggle/'
+    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
     # data_root = '/root/autodl-tmp'
 
