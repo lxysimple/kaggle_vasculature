@@ -52,7 +52,7 @@ class CFG:
     input_size = 512 # 512/768/1024/1280/1536  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 2 # def=16 # 训练批量大小
+    train_batch_size = 16 # def=16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
@@ -104,8 +104,13 @@ class CFG:
     ]
     train_aug = A.Compose(train_aug_list)
     valid_aug_list = [
+        # # my code
+        # # 只有当input_size很大时才开启，这样随机裁剪就失效了
+        # A.Resize(height=input_size, width=input_size, p=1),
+
         # 注意这个不是整张图片，而是在随机裁剪的图片上做验证的
         A.RandomCrop(input_size, input_size, p=1),  
+
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
