@@ -48,8 +48,8 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 1280 # 512/768/1024/1280/1536  # 图片大小 
-    input_size = 1280 # 512/768/1024/1280/1536  # 输入尺寸
+    image_size = 512 # 512/768/1024/1280/1536  # 图片大小 
+    input_size = 512 # 512/768/1024/1280/1536  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     train_batch_size = 2 # def=16 # 训练批量大小
@@ -588,7 +588,7 @@ if __name__=='__main__':
             
             # 数据预处理
             x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
-            # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
+            x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
             # 使用自动混合精度进行前向传播和损失计算
             with autocast():
