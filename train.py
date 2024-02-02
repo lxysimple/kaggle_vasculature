@@ -227,44 +227,44 @@ def norm_with_clip(x: tc.Tensor, smooth=1e-5):
 
 # ============================ add noise ============================
 
-# def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_normed=False):
-#     """
-#     给定输入张量 x, 添加噪声并返回处理后的张量
+def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_normed=False):
+    """
+    给定输入张量 x, 添加噪声并返回处理后的张量
 
-#     Args:
-#         - x: 输入张量，形状为 (batch, f1, f2, ...).
-#         - max_randn_rate: 随机噪声的最大比例，默认为 0.1.
-#         - randn_rate: 可选参数, 手动指定噪声比例，如果为 None 则随机生成.
-#         - x_already_normed: 布尔值, 指示输入张量是否已经进行了标准化.
+    Args:
+        - x: 输入张量，形状为 (batch, f1, f2, ...).
+        - max_randn_rate: 随机噪声的最大比例，默认为 0.1.
+        - randn_rate: 可选参数, 手动指定噪声比例，如果为 None 则随机生成.
+        - x_already_normed: 布尔值, 指示输入张量是否已经进行了标准化.
 
-#     Returns:
-#         处理后的张量, 其方差已被归一化.
+    Returns:
+        处理后的张量, 其方差已被归一化.
 
-#     Warning:
-#         - 如果输入张量已经标准化 (x_already_normed=True)，则 x_std 为全 1 张量, x_mean 为全 0 张量.
-#         - 如果输入张量未标准化，根据输入的维度进行标准化处理.
+    Warning:
+        - 如果输入张量已经标准化 (x_already_normed=True)，则 x_std 为全 1 张量, x_mean 为全 0 张量.
+        - 如果输入张量未标准化，根据输入的维度进行标准化处理.
 
-#     Reference:
-#         - https://blog.csdn.net/chaosir1991/article/details/106960408
-#     """
-#     ndim = x.ndim - 1
+    Reference:
+        - https://blog.csdn.net/chaosir1991/article/details/106960408
+    """
+    ndim = x.ndim - 1
 
-#     if x_already_normed:
-#         x_std = tc.ones([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
-#         x_mean = tc.zeros([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
-#     else:
-#         dim = list(range(1, x.ndim))
-#         x_std = x.std(dim=dim, keepdim=True)
-#         x_mean = x.mean(dim=dim, keepdim=True)
+    if x_already_normed:
+        x_std = tc.ones([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
+        x_mean = tc.zeros([x.shape[0]] + [1] * ndim, device=x.device, dtype=x.dtype)
+    else:
+        dim = list(range(1, x.ndim))
+        x_std = x.std(dim=dim, keepdim=True)
+        x_mean = x.mean(dim=dim, keepdim=True)
 
-#     if randn_rate is None:
-#         randn_rate = max_randn_rate * np.random.rand() * tc.rand(x_mean.shape, device=x.device, dtype=x.dtype)
+    if randn_rate is None:
+        randn_rate = max_randn_rate * np.random.rand() * tc.rand(x_mean.shape, device=x.device, dtype=x.dtype)
 
-#     # 计算噪声缩放系数
-#     cache = (x_std ** 2 + (x_std * randn_rate) ** 2) ** 0.5 + 1e-7
+    # 计算噪声缩放系数
+    cache = (x_std ** 2 + (x_std * randn_rate) ** 2) ** 0.5 + 1e-7
 
-#     # 添加噪声并返回处理后的张量
-#     return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
+    # 添加噪声并返回处理后的张量
+    return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
 
 # ============================ dataset just for loading ============================
 
@@ -599,7 +599,7 @@ if __name__=='__main__':
             
             # 数据预处理
             x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
-            # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
+            x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
             # 使用自动混合精度进行前向传播和损失计算
             with autocast(): # 计算加速，适应一些比较好的GPU
