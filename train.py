@@ -67,9 +67,9 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 40 # 20/40  # 训练轮数
+    epochs = 20 # 20/40  # 训练轮数
     
-    lr = 6e-5  # 学习率
+    lr = 6e-6 # 6e-5  # 学习率
 
     chopping_percentile = 1e-3  # 切割百分比
 
@@ -160,12 +160,12 @@ def build_model(weight="imagenet"):
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
-    # 构建并返回模型
-    model = CustomModel(CFG, weight)
+    # # 构建并返回模型
+    # model = CustomModel(CFG, weight)
 
-    # # my code
-    # model = CustomModel(CFG, None)
-    # model.load_state_dict(tc.load('/root/xy/best_loss.pt'))
+    # my code
+    model = CustomModel(CFG, None)
+    model.load_state_dict(tc.load('/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_6_loss0.25_score0.78_val_loss0.28_val_score0.81.pt'))
 
     return model.cuda()
 
@@ -558,8 +558,9 @@ if __name__=='__main__':
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
     scaler = tc.cuda.amp.GradScaler()
 
-    # 使用OneCycleLR策略，单位:epoch
-    # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
+
+    # # 使用OneCycleLR策略，单位:epoch
+    # # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
     # scheduler = tc.optim.lr_scheduler.OneCycleLR(
     #     optimizer, 
     #     max_lr=CFG.lr,
@@ -568,9 +569,10 @@ if __name__=='__main__':
     #     pct_start=0.1
     # )
 
+
     scheduler = tc.optim.lr_scheduler.MultiStepLR(
         optimizer, 
-        milestones=[20,35], 
+        milestones=[7,14], 
         gamma=0.1,
         last_epoch=-1
     )

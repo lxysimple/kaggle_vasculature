@@ -573,12 +573,12 @@ if __name__=='__main__':
     #     epochs=CFG.epochs+1,
     #     pct_start=0.1
     # )
-    scheduler = tc.optim.lr_scheduler.MultiStepLR(
-        optimizer, 
-        milestones=[20,35], 
-        gamma=0.1,
-        last_epoch=-1
-    )
+    # scheduler = tc.optim.lr_scheduler.MultiStepLR(
+    #     optimizer, 
+    #     milestones=[20,35], 
+    #     gamma=0.1,
+    #     last_epoch=-1
+    # )
 
     # =============== define objects ===============
 
