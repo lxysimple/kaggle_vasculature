@@ -602,7 +602,7 @@ if __name__=='__main__':
             # x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
             # 使用自动混合精度进行前向传播和损失计算
-            with autocast():
+            with autocast(): # 计算加速，适应一些比较好的GPU
                 pred = model(x)
                 loss = loss_fc(pred, y)
             
