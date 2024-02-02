@@ -48,8 +48,8 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 512 # 512/768/1024/1280/1536  # 图片大小 
-    input_size = 512 # 512/768/1024/1280/1536  # 输入尺寸
+    image_size = 768 # 512/768/1024/1280/1536  # 图片大小 
+    input_size = 768 # 512/768/1024/1280/1536  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     train_batch_size = 16 # def=16 # 训练批量大小
@@ -573,12 +573,12 @@ if __name__=='__main__':
     #     epochs=CFG.epochs+1,
     #     pct_start=0.1
     # )
-    # scheduler = tc.optim.lr_scheduler.MultiStepLR(
-    #     optimizer, 
-    #     milestones=[20,35], 
-    #     gamma=0.1,
-    #     last_epoch=-1
-    # )
+    scheduler = tc.optim.lr_scheduler.MultiStepLR(
+        optimizer, 
+        milestones=[20,35], 
+        gamma=0.1,
+        last_epoch=-1
+    )
 
     # =============== define objects ===============
 
