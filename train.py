@@ -59,8 +59,8 @@ class CFG:
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 1280 # 896/512/1024/1280  # 图片大小 
-    input_size = 1280 # 896/512/1024/1280  # 输入尺寸
+    image_size = 1024 # 896/512/1024/1280  # 图片大小 
+    input_size = 1024 # 896/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     train_batch_size = 16 # 16 # 训练批量大小
