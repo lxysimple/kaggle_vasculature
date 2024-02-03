@@ -829,7 +829,6 @@ if __name__=='__main__':
             # 使用自动混合精度进行前向传播和损失计算
             with autocast(): # 计算加速，适应一些比较好的GPU
                 output = model(input)
-
                 loss=None
                 if random_number < 0.3:
                     loss = cutmix_criterion(output, targets) # 注意这是在CPU上运算的
