@@ -84,8 +84,8 @@ class CFG:
 
     # chopping_percentile = 0.0062  # kidney_1_denses
     # chopping_percentile = 0.0041  # kidney_1_denses
-    chopping_percentile = 0.0027  # kidney_3_sparse
-    # chopping_percentile = 0.012   # kidney_1_voi
+    # chopping_percentile = 0.0027  # kidney_3_sparse
+    chopping_percentile = 0.012   # kidney_1_voi
     # chopping_percentile = 0.0022  # kidney_3_dense
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_5_loss0.14_score0.75_val_loss0.19_val_score0.84.pt'
@@ -96,9 +96,9 @@ class CFG:
 
     paths = [
         # f"{data_root}/train/kidney_1_dense",
-        # f"{data_root}/train/kidney_1_voi",
+        f"{data_root}/train/kidney_1_voi",
         # f"{data_root}/train/kidney_2",
-        f"{data_root}/train/kidney_3_sparse",
+        # f"{data_root}/train/kidney_3_sparse",
 
         # f"{data_root}/train/kidney_3_dense",
     ]
