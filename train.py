@@ -836,7 +836,7 @@ if __name__=='__main__':
                 elif random_number > 0.7:
                     loss = mixup_criterion(output, targets) # 注意这是在CPU上运算的
                 else:
-                    loss = criterion(output, target)
+                    loss = loss_fc(output, target)
 
             
             # # 使用自动混合精度进行前向传播和损失计算
