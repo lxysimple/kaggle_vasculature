@@ -72,7 +72,7 @@ class CFG:
     input_size = 512 # 896/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 8 # 16 # 训练批量大小
+    train_batch_size = 12 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 4 # 2
 
@@ -850,7 +850,7 @@ if __name__=='__main__':
             scaler.update()
 
             optimizer.zero_grad()
-            scheduler.step()
+            # scheduler.step()
             
             # 计算并更新平均损失和分数
             score = dice_coef(pred.detach(), y)
@@ -863,7 +863,7 @@ if __name__=='__main__':
             # 释放显存
             del loss, pred
 
-        # scheduler.step() # 不同的scheduler的优化单位不一样
+        scheduler.step() # 不同的scheduler的优化单位不一样
 
         # =============== validation ===============
 
