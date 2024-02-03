@@ -71,22 +71,23 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 4 # 2
 
-    epochs = 10 # 20/40  # 训练轮数
+    epochs = 20 # 20/40  # 训练轮数
 
     
     # milestones = [4,8] # kidney_1_denses
     # milestones = [4,8] # kidney_1_denses
-    milestones = [4,8] 
+    milestones = [7,14] 
 
     # 学习率
-    lr =  6e-7
+    lr =  6e-5
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses
     # chopping_percentile = 0.0041  # kidney_1_denses
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.012 # kidney_1_voi ,这个数据集已经最优了，无法再优化
-    chopping_percentile = 0.0022  # kidney_3_dense
+    # chopping_percentile = 0.0022  # kidney_3_dense
+    chopping_percentile = 0.003  # avg
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_0_loss0.25_score0.67_val_loss0.14_val_score0.86.pt'
 
@@ -105,7 +106,7 @@ class CFG:
 
     # 验证集路径
     # valid_path = f"{data_root}/train/kidney_3_dense"
-    valid_path = f"{data_root}/train/kidney_1_dense"
+    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
