@@ -85,7 +85,7 @@ class CFG:
     lr =  6e-7
     # lr =  6e-7  # 6e-6 # 6e-5  
 
-    # chopping_percentile = 0.0062  # kidney_1_denses
+    # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
     # chopping_percentile = 0.0041  # kidney_2
     chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
