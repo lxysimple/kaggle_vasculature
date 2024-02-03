@@ -88,12 +88,16 @@ class CFG:
 
     paths = [
                 # f"{data_root}/train/kidney_1_dense",
-                f"{data_root}/train/kidney_1_voi",
+                # f"{data_root}/train/kidney_1_voi",
                 # f"{data_root}/train/kidney_2",
                 # f"{data_root}/train/kidney_3_sparse",
 
-                # f"{data_root}/train/kidney_3_dense",
+                f"{data_root}/train/kidney_3_dense",
             ]
+
+    # 验证集路径
+    valid_path = f"{data_root}/train/kidney_3_sparse"
+    # valid_path = f"{data_root}/train/kidney_3_dense"
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
@@ -611,12 +615,10 @@ if __name__=='__main__':
         train_x.append(x.permute(2, 0, 1))
         train_y.append(y.permute(2, 0, 1))
     
-    # 验证集路径
-    path1 = f"{CFG.data_root}/train/kidney_3_sparse"
-    path2 = f"{CFG.data_root}/train/kidney_3_dense"
+    
 
     # 获取验证集图像和标签路径列表
-    paths_y = glob(f"{path2}/labels/*")
+    paths_y = glob(f"{CFG.valid_path}/labels/*")
     paths_x = [x.replace("labels", "images").replace("dense", "sparse") for x in paths_y]
 
     # =============== data path ===============
