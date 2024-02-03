@@ -826,8 +826,6 @@ if __name__=='__main__':
                 targets[2]=torch.tensor(targets[2]).cuda()
             else:
                 None
-
-
             # 使用自动混合精度进行前向传播和损失计算
             with autocast(): # 计算加速，适应一些比较好的GPU
                 output = model(x)
@@ -839,7 +837,7 @@ if __name__=='__main__':
                     loss = mixup_criterion(output, targets) # 注意这是在CPU上运算的
                 else:
                     loss = loss_fc(output, target)
-
+            pred = output
             
             # # 使用自动混合精度进行前向传播和损失计算
             # with autocast(): # 计算加速，适应一些比较好的GPU
