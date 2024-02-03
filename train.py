@@ -43,6 +43,7 @@ from segmentation_models_pytorch.decoders.unet.model import UnetDecoder
 from typing import Optional, Union, List
 import timm
 
+import random
 # ============================ global configure ============================
 
 # 显存： 骨干网络的复杂度 vs 输入尺寸 vs 批大小
