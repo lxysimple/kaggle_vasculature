@@ -77,6 +77,8 @@ class CFG:
 
     chopping_percentile = 0.0062  # kidney_1_denses
 
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_5_loss0.19_score0.66_val_loss0.19_val_score0.89.pt'
+
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
     # data_root = '/root/autodl-tmp'
@@ -217,7 +219,7 @@ def build_model(weight="imagenet"):
 
     # my code
     model = CustomModel(CFG, None)
-    model.load_state_dict(tc.load('/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_6_loss0.25_score0.78_val_loss0.28_val_score0.81.pt'))
+    model.load_state_dict(tc.load(CFG.checkpint))
 
     return model.cuda()
 
