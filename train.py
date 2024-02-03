@@ -93,13 +93,13 @@ class CFG:
     # data_root = '/root/autodl-tmp'
 
     paths = [
-                f"{data_root}/train/kidney_1_dense",
-                # f"{data_root}/train/kidney_1_voi",
-                # f"{data_root}/train/kidney_2",
-                # f"{data_root}/train/kidney_3_sparse",
+        f"{data_root}/train/kidney_1_dense",
+        # f"{data_root}/train/kidney_1_voi",
+        # f"{data_root}/train/kidney_2",
+        # f"{data_root}/train/kidney_3_sparse",
 
-                # f"{data_root}/train/kidney_3_dense",
-            ]
+        # f"{data_root}/train/kidney_3_dense",
+    ]
 
     # 验证集路径
     valid_path = f"{data_root}/train/kidney_3_dense"
