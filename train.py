@@ -1,12 +1,7 @@
 """
 和baseline不同之处：
-    数据增强有点不一样，我去掉了一点，新增了一点自己的
     验证集数据增强不一样，baseline验证集没有裁剪图片
-    去掉了add_noise
     因为数据增强有裁剪，所以去掉了随机裁剪，我感觉把一张图依次裁剪完整别随机裁，可能更好
-    数据增强中，真的适合mask也增强吗，我记得smp中有关于分割的数据增强
-    去掉了随机翻转、旋转手工数据增强
-
 """
 
 
@@ -102,6 +97,7 @@ class CFG:
         A.Rotate(limit=45, p=0.5),  # 旋转
         A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
 
+        # 这里是输入模型训练的裁剪
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
 
         A.RandomGamma(p=0.75),  # 随机Gamma变换
@@ -112,14 +108,11 @@ class CFG:
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
-    valid_aug_list = [
-        # my code
-        # 只有当input_size很大时才开启，这样随机裁剪就失效了
-        A.Resize(height=input_size, width=input_size, p=1),
-
+    valid_aug_list = [ 
         # 注意这个不是整张图片，而是在随机裁剪的图片上做验证的
-        A.RandomCrop(input_size, input_size, p=1),  
+        A.RandomCrop(input_size, input_size, p=1),
 
+        # 验证集不需要裁剪，因为Unet输入尺寸固定，但好像要32的倍数
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
@@ -265,7 +258,34 @@ def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_norme
     return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
 
 # ============================ dataset just for loading ============================
+def to_size(img , image_size = 1024):
+    if image_size > img.shape[1]:
+       img = np.rot90(img)
+       start1 = (CFG.image_size - img.shape[0])//2 
+       top = img[0:start1,0:img.shape[1] ]
+       bottom = img[img.shape[0]-start1:img.shape[0], 0:img.shape[1]]
+       img_result = np.concatenate((top,img,bottom ),axis=0)
+       img_result = np.rot90(img_result)
+       img_result = np.rot90(img_result)
+       img_result = np.rot90(img_result)
+    else :
+       img_result = img
+    return img_result
 
+def to_size_no_rot(img, image_size = 1024):
+    if image_size > img.shape[0]:  
+       start1 = (image_size - img.shape[0])//2
+       top = img[0: start1,0: img.shape[1]]
+       bottom = img[img.shape[0]-start1:img.shape[0],0:img.shape[1]]
+       img_result = np.concatenate((top,img,bottom ),axis=0)
+    else: 
+       img_result = img
+    return img_result
+
+def to_size_size(img, image_size = 1024 ):
+     img_result = to_size(img,image_size)
+     return img_result
+    
 class Data_loader(Dataset):
     """" just put the data into the memory. """
 
@@ -282,6 +302,7 @@ class Data_loader(Dataset):
     def __getitem__(self, index):
         # 获取数据集中指定索引的样本
         img = cv2.imread(self.paths[index], cv2.IMREAD_GRAYSCALE)  # 读取灰度图像
+        img = to_size_size(img , image_size = CFG.image_size ) # my code
         img = tc.from_numpy(img)  # 将图像转换为PyTorch张量
 
         if self.is_label:
@@ -429,11 +450,8 @@ class Kaggld_Dataset(Dataset):
         y = self.y[i]
             
         # # 在图中裁剪(image_size, image_size)区域，x_index定义裁剪开始位置
-        # # x_index = np.random.randint(0, x.shape[1] - self.image_size )
-        # # y_index = np.random.randint(0, x.shape[2] - self.image_size )
-        # # my code
-        # x_index = np.random.randint(0, x.shape[1] - self.image_size + 1)
-        # y_index = np.random.randint(0, x.shape[2] - self.image_size + 1)
+        # x_index = np.random.randint(0, x.shape[1] - self.image_size )
+        # y_index = np.random.randint(0, x.shape[2] - self.image_size )
 
         # # 同时对in_chans个图进行裁剪
         # x = x[index:index + self.in_chans, x_index:x_index + self.image_size, y_index:y_index + self.image_size]
@@ -482,23 +500,42 @@ if __name__=='__main__':
     # 'path' is the directory path of [kidney_1_dense, kidney_1_voi, ...]
     for i, path in enumerate(paths): 
 
-        # 排除特定路径, but I think it will not be run.
-        if path == f"{CFG.data_root}/train/kidney_3_dense":    
-            continue
+        if path=="/root/autodl-tmp/train/kidney_3_dense":
+            path1="/root/autodl-tmp/train/kidney_3_sparse"
+            path2="/root/autodl-tmp/train/kidney_3_dense"
+            paths_y=glob(f"{path2}/labels/*")
+            paths_x=[x.replace("labels","images").replace("dense","sparse") for x in paths_y]
+            x=load_data(paths_x,is_label=False)
+            print(x.shape)
+            y=load_data(paths_y,is_label=True)
+            print(y.shape)
+            train_x.append(x)
+            train_y.append(y)        
+        else:
+            x=load_data(glob(f"{path}/images/*"),is_label=False)
+            print(x.shape)
+            y=load_data(glob(f"{path}/labels/*"),is_label=True)
+            print(y.shape)
+            train_x.append(x)
+            train_y.append(y)
+
+        # # 排除特定路径, but I think it will not be run.
+        # if path == f"{CFG.data_root}/train/kidney_3_dense":    
+        #     continue
         
-        # 每次加载一个数据集，也是一个3D肾
-        # 这里90%已经被自动排序了
-        x = load_data(glob(f"{path}/images/*"), is_label=False)
+        # # 每次加载一个数据集，也是一个3D肾
+        # # 这里90%已经被自动排序了
+        # x = load_data(glob(f"{path}/images/*"), is_label=False)
+        ptint(path)
         print("train dataset x shape:", x.shape)
         
-        # 加载标签数据
-        y = load_data(glob(f"{path}/labels/*"), is_label=True)
+        # # 加载标签数据
+        # y = load_data(glob(f"{path}/labels/*"), is_label=True)
         print("train dataset y shape:", y.shape)
         
-        
-        # 将数据添加到训练集, (c,h,w)
-        train_x.append(x)
-        train_y.append(y)
+        # # 将数据添加到训练集, (c,h,w)
+        # train_x.append(x)
+        # train_y.append(y)
 
         # 对1个3D肾进行特有的切片数据增强
         # 维度变换,(h,w,c),本来是以z轴切图的,现在以x轴切图
