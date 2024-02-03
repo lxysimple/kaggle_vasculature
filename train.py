@@ -102,9 +102,8 @@ class CFG:
             ]
 
     # 验证集路径
-    # valid_path = f"{data_root}/train/kidney_3_sparse"
     valid_path = f"{data_root}/train/kidney_3_dense"
-    # valid_path = f"{data_root}/train/kidney_1_dense"
+    # valid_path = f"{data_root}/train/kidney_1_voi"
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
