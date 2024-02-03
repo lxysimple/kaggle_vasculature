@@ -499,10 +499,10 @@ if __name__=='__main__':
 
     # 'path' is the directory path of [kidney_1_dense, kidney_1_voi, ...]
     for i, path in enumerate(paths): 
-
-        if path=="/root/autodl-tmp/train/kidney_3_dense":
-            path1="/root/autodl-tmp/train/kidney_3_sparse"
-            path2="/root/autodl-tmp/train/kidney_3_dense"
+        # 这里可以把kidney_3_dense做训练集啦
+        if path==f"{data_root}/train/kidney_3_dense":
+            path1=f"{data_root}/train/kidney_3_sparse"
+            path2=f"{data_root}/train/kidney_3_dense"
             paths_y=glob(f"{path2}/labels/*")
             paths_x=[x.replace("labels","images").replace("dense","sparse") for x in paths_y]
             x=load_data(paths_x,is_label=False)
