@@ -77,32 +77,34 @@ class CFG:
     # milestones = [4,8]
     
     # 学习率
-    lr =  6e-7
+    lr =  6e-6
     # lr =  6e-7  # 6e-6 # 6e-5  
 
-    # chopping_percentile = 0.0062  # kidney_1_denses
-    # chopping_percentile = 0.012 # kidney_1_voi
-    chopping_percentile = 0.0022 # kidney_3_dense
+    chopping_percentile = 0.0062  # kidney_1_denses
+    # chopping_percentile = 0.0041  # kidney_2
+    # chopping_percentile = 0.0027  # kidney_3_sparse
+    # chopping_percentile = 0.012   # kidney_1_voi
+    # chopping_percentile = 0.0022  # kidney_3_dense
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_2_loss0.21_score0.79_val_loss0.21_val_score0.89.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_26_loss0.10_score0.90_val_loss0.12_val_score0.88_midd_1024.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
     # data_root = '/root/autodl-tmp'
 
     paths = [
-                # f"{data_root}/train/kidney_1_dense",
+                f"{data_root}/train/kidney_1_dense",
                 # f"{data_root}/train/kidney_1_voi",
                 # f"{data_root}/train/kidney_2",
                 # f"{data_root}/train/kidney_3_sparse",
 
-                f"{data_root}/train/kidney_3_dense",
+                # f"{data_root}/train/kidney_3_dense",
             ]
 
     # 验证集路径
     # valid_path = f"{data_root}/train/kidney_3_sparse"
-    # valid_path = f"{data_root}/train/kidney_3_dense"
-    valid_path = f"{data_root}/train/kidney_1_dense"
+    valid_path = f"{data_root}/train/kidney_3_dense"
+    # valid_path = f"{data_root}/train/kidney_1_dense"
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
