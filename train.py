@@ -73,16 +73,18 @@ class CFG:
 
     epochs = 10 # 20/40  # 训练轮数
 
-    milestones = [4,8]
-    # milestones = [4,8]
     
+    # milestones = [4,8] # kidney_1_denses
+    # milestones = [4,8] # kidney_1_denses
+    milestones = [4,8] 
+
     # 学习率
     lr =  6e-6
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses
-    chopping_percentile = 0.0041  # kidney_2
-    # chopping_percentile = 0.0027  # kidney_3_sparse
+    # chopping_percentile = 0.0041  # kidney_1_denses
+    chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.012   # kidney_1_voi
     # chopping_percentile = 0.0022  # kidney_3_dense
 
@@ -95,8 +97,8 @@ class CFG:
     paths = [
         # f"{data_root}/train/kidney_1_dense",
         # f"{data_root}/train/kidney_1_voi",
-        f"{data_root}/train/kidney_2",
-        # f"{data_root}/train/kidney_3_sparse",
+        # f"{data_root}/train/kidney_2",
+        f"{data_root}/train/kidney_3_sparse",
 
         # f"{data_root}/train/kidney_3_dense",
     ]
