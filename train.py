@@ -85,8 +85,8 @@ class CFG:
     # chopping_percentile = 0.0062  # kidney_1_denses
     # chopping_percentile = 0.0041  # kidney_1_denses
     # chopping_percentile = 0.0027  # kidney_3_sparse
-    chopping_percentile = 0.012 # kidney_1_voi ,这个数据集已经最优了，无法再优化
-    # chopping_percentile = 0.0022  # kidney_3_dense
+    # chopping_percentile = 0.012 # kidney_1_voi ,这个数据集已经最优了，无法再优化
+    chopping_percentile = 0.0022  # kidney_3_dense
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_4_loss0.21_score0.69_val_loss0.18_val_score0.85.pt'
 
@@ -96,16 +96,16 @@ class CFG:
 
     paths = [
         # f"{data_root}/train/kidney_1_dense",
-        f"{data_root}/train/kidney_1_voi",
+        # f"{data_root}/train/kidney_1_voi",
         # f"{data_root}/train/kidney_2",
         # f"{data_root}/train/kidney_3_sparse",
 
-        # f"{data_root}/train/kidney_3_dense",
+        f"{data_root}/train/kidney_3_dense",
     ]
 
     # 验证集路径
-    valid_path = f"{data_root}/train/kidney_3_dense"
-    # valid_path = f"{data_root}/train/kidney_1_voi"
+    # valid_path = f"{data_root}/train/kidney_3_dense"
+    valid_path = f"{data_root}/train/kidney_1_voi"
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
