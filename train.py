@@ -86,7 +86,7 @@ class CFG:
     # chopping_percentile = 0.012   # kidney_1_voi
     # chopping_percentile = 0.0022  # kidney_3_dense
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_26_loss0.10_score0.90_val_loss0.12_val_score0.88_midd_1024.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_1_loss0.25_score0.62_val_loss0.26_val_score0.75.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
