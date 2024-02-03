@@ -815,12 +815,12 @@ if __name__=='__main__':
             target = y
             input = x
             if random_number < 0.3:
-                input,targets=cutmix(input,target,0.5)
+                input,targets=cutmix(input,target,0.2)
                 targets[0]=(targets[0]).clone().detach().cuda()
                 targets[1]=(targets[1]).clone().detach().cuda()
                 targets[2]=tc.Tensor(targets[2]).clone().detach().cuda()
             elif random_number > 0.7:
-                input,targets=mixup(input,target,0.5)
+                input,targets=mixup(input,target,0.2)
                 targets[0]=(targets[0]).clone().detach().cuda()
                 targets[1]=(targets[1]).clone().detach().cuda()
                 targets[2]=tc.Tensor(targets[2]).clone().detach().cuda()
