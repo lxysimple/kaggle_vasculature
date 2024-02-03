@@ -77,7 +77,7 @@ class CFG:
     # milestones = [4,8]
     
     # 学习率
-    lr =  6e-6
+    lr =  6e-7
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses
