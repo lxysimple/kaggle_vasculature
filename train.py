@@ -71,23 +71,24 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 15 # 20/40  # 训练轮数
+    epochs = 10 # 20/40  # 训练轮数
 
-    milestones = [5,10]
+    milestones = [5,8]
     
     lr = 6e-6 # 6e-5  # 学习率
 
-    chopping_percentile = 0.0062  # kidney_1_denses
+    # chopping_percentile = 0.0062  # kidney_1_denses
+    chopping_percentile = 0.012 # kidney_1_voi
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_5_loss0.19_score0.66_val_loss0.19_val_score0.89.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_7_loss0.18_score0.68_val_loss0.19_val_score0.89.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
     # data_root = '/root/autodl-tmp'
 
     paths = [
-                f"{data_root}/train/kidney_1_dense",
-                # f"{data_root}/train/kidney_1_voi",
+                # f"{data_root}/train/kidney_1_dense",
+                f"{data_root}/train/kidney_1_voi",
                 # f"{data_root}/train/kidney_2",
                 # f"{data_root}/train/kidney_3_sparse",
 
