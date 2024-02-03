@@ -93,8 +93,6 @@ class CFG:
 
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
-        # useless
-        # A.RandomGamma(p=0.75),  # 随机Gamma变换
 
         # my code
         # 只有当input_size很大时才开启，这样随机裁剪就失效了
@@ -106,11 +104,11 @@ class CFG:
 
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
 
+        A.RandomGamma(p=0.75),  # 随机Gamma变换
         A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
         A.GaussianBlur(p=0.5),  # 高斯模糊
         A.MotionBlur(p=0.5),  # 运动模糊
         A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
-
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
@@ -535,8 +533,8 @@ if __name__=='__main__':
     # train_x=[kidney1{cut by z}, kidney1{cut by x}, kidney1{cut by y}, ...]
     train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
     # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
-    # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=2, shuffle=True, pin_memory=True)
-    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=False, pin_memory=True)
+    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=True, pin_memory=True)
+    # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=False, pin_memory=True)
 
     # 创建验证数据集对象，使用Kaggld_Dataset类，传入验证数据和标签
     val_dataset = Kaggld_Dataset([val_x], [val_y])
