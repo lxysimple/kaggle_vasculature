@@ -669,6 +669,7 @@ if __name__=='__main__':
     )
 
     # # 实践发现，se_resnext50_32x4d同一层级学习率7个epoch后就差不多饱和了
+    # # 难以实现warm-up，遂放弃
     # scheduler = tc.optim.lr_scheduler.MultiStepLR(
     #     optimizer, 
     #     milestones=[7,14], 
