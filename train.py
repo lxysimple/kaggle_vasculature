@@ -816,14 +816,14 @@ if __name__=='__main__':
             input = x
             if random_number < 0.3:
                 input,targets=cutmix(input,target,0.2)
-                targets[0]=torch.tensor(targets[0]).cuda()
-                targets[1]=torch.tensor(targets[1]).cuda()
-                targets[2]=torch.tensor(targets[2]).cuda()
+                targets[0]=tc.tensor(targets[0]).cuda()
+                targets[1]=tc.tensor(targets[1]).cuda()
+                targets[2]=tc.tensor(targets[2]).cuda()
             elif random_number > 0.7:
                 input,targets=mixup(input,target,0.2)
-                targets[0]=torch.tensor(targets[0]).cuda()
-                targets[1]=torch.tensor(targets[1]).cuda()
-                targets[2]=torch.tensor(targets[2]).cuda()
+                targets[0]=tc.tensor(targets[0]).cuda()
+                targets[1]=tc.tensor(targets[1]).cuda()
+                targets[2]=tc.tensor(targets[2]).cuda()
             else:
                 None
             # 使用自动混合精度进行前向传播和损失计算
