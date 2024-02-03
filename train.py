@@ -91,7 +91,7 @@ class CFG:
     # chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
-    chopping_percentile = 0.003  # avg
+    chopping_percentile = 0.0043  # avg kidney_1_dense+kidney_2+kidney_3_sparse
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/resnext50_32x4d_1_loss0.17_score0.70_val_loss0.11_val_score0.94.pt'
