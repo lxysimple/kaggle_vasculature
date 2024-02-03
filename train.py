@@ -850,7 +850,7 @@ if __name__=='__main__':
             scaler.update()
 
             optimizer.zero_grad()
-            # scheduler.step()
+            scheduler.step()
             
             # 计算并更新平均损失和分数
             score = dice_coef(pred.detach(), y)
@@ -863,7 +863,7 @@ if __name__=='__main__':
             # 释放显存
             del loss, pred
 
-        scheduler.step() # 不同的scheduler的优化单位不一样
+        # scheduler.step() # 不同的scheduler的优化单位不一样
 
         # =============== validation ===============
 
