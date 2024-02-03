@@ -625,7 +625,8 @@ if __name__=='__main__':
     print("validate dataset x shape:", val_x.shape)
     val_y = load_data(paths_y, is_label=True)
     print("validate dataset y shape:", val_y.shape)	
-
+    print()
+    
     # =============== load the data ===============
 
     # =============== define objects ===============
