@@ -805,12 +805,15 @@ if __name__=='__main__':
 
             x = x.cuda().to(tc.float32)
             y = y.cuda().to(tc.float32)
+
             
             # 数据预处理
             x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
             x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
             random_number = random.random() # 生成一个0到1之间的随机数
+            target = y
+            input = x
             if random_number < 0.3:
                 input,targets=cutmix(input,target,0.2)
                 targets[0]=torch.tensor(targets[0]).cuda()
@@ -823,8 +826,6 @@ if __name__=='__main__':
                 targets[2]=torch.tensor(targets[2]).cuda()
             else:
                 None
-            input = input.cuda()
-            target = target.cuda()
 
 
             # 使用自动混合精度进行前向传播和损失计算
