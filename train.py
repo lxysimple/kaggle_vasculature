@@ -73,7 +73,7 @@ class CFG:
 
     epochs = 20 # 20/40  # 训练轮数
     
-    lr = 6e-6 # 6e-5  # 学习率
+    lr = 6e-5 # 6e-5  # 学习率
 
     chopping_percentile = 1e-3  # 切割百分比
 
