@@ -71,9 +71,9 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 2
 
-    epochs = 20 # 20/40  # 训练轮数
+    epochs = 15 # 20/40  # 训练轮数
     
-    lr = 6e-5 # 6e-5  # 学习率
+    lr = 6e-6 # 6e-5  # 学习率
 
     chopping_percentile = 0.0062  # kidney_1_denses
 
@@ -659,25 +659,25 @@ if __name__=='__main__':
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
     scaler = tc.cuda.amp.GradScaler()
 
-    # 非常好用，因为有warm-up，对预训练模型有大大的好处
-    # 使用OneCycleLR策略，单位:epoch
-    # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
-    scheduler = tc.optim.lr_scheduler.OneCycleLR(
-        optimizer, 
-        max_lr=CFG.lr,
-        steps_per_epoch=len(train_dataset), 
-        epochs=CFG.epochs+1,
-        pct_start=0.1
-    )
-
-    # # 实践发现，se_resnext50_32x4d同一层级学习率7个epoch后就差不多饱和了
-    # # 难以实现warm-up，遂放弃
-    # scheduler = tc.optim.lr_scheduler.MultiStepLR(
+    # # 非常好用，因为有warm-up，对预训练模型有大大的好处
+    # # 使用OneCycleLR策略，单位:epoch
+    # # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
+    # scheduler = tc.optim.lr_scheduler.OneCycleLR(
     #     optimizer, 
-    #     milestones=[7,14], 
-    #     gamma=0.1,
-    #     last_epoch=-1
+    #     max_lr=CFG.lr,
+    #     steps_per_epoch=len(train_dataset), 
+    #     epochs=CFG.epochs+1,
+    #     pct_start=0.1
     # )
+
+    # 实践发现，se_resnext50_32x4d同一层级学习率7个epoch后就差不多饱和了
+    # 难以实现warm-up，但如果模型已经具备一定的能力，就无需warm-up了
+    scheduler = tc.optim.lr_scheduler.MultiStepLR(
+        optimizer, 
+        milestones=[5,10], 
+        gamma=0.1,
+        last_epoch=-1
+    )
 
     # =============== define objects ===============
 
@@ -714,7 +714,7 @@ if __name__=='__main__':
             scaler.update()
 
             optimizer.zero_grad()
-            scheduler.step()
+            # scheduler.step()
             
             # 计算并更新平均损失和分数
             score = dice_coef(pred.detach(), y)
@@ -727,7 +727,7 @@ if __name__=='__main__':
             # 释放显存
             del loss, pred
 
-        # scheduler.step() # 不同的scheduler的优化单位不一样
+        scheduler.step() # 不同的scheduler的优化单位不一样
 
         # =============== validation ===============
 
