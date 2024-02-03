@@ -625,7 +625,7 @@ if __name__=='__main__':
     # 获取验证集图像和标签路径列表
     paths_y = glob(f"{CFG.valid_path}/labels/*")
 
-    if path==f"{CFG.data_root}/train/kidney_3_dense": # 当验证集是kidney_3_dense
+    if CFG.valid_path==f"{CFG.data_root}/train/kidney_3_dense": # 当验证集是kidney_3_dense
         paths_x = [x.replace("labels", "images").replace("dense", "sparse") for x in paths_y]
     else: # 当验证集是其他
         paths_x = [x.replace("labels", "images") for x in paths_y]
