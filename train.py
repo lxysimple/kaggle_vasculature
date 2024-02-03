@@ -239,12 +239,12 @@ def build_model(weight="imagenet"):
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
-    # # 构建并返回模型
-    # model = CustomModel(CFG, weight)
+    # 构建并返回模型
+    model = CustomModel(CFG, weight)
 
-    # my code
-    model = CustomModel(CFG, None)
-    model.load_state_dict(tc.load(CFG.checkpint))
+    # # my code
+    # model = CustomModel(CFG, None)
+    # model.load_state_dict(tc.load(CFG.checkpint))
 
     return model.cuda()
 
