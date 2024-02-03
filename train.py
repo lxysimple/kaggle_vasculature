@@ -828,7 +828,7 @@ if __name__=='__main__':
                 None
             # 使用自动混合精度进行前向传播和损失计算
             with autocast(): # 计算加速，适应一些比较好的GPU
-                output = model(x)
+                output = model(input)
 
                 loss=None
                 if random_number < 0.3:
