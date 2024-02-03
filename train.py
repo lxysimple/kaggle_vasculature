@@ -85,9 +85,9 @@ class CFG:
     lr =  6e-7
     # lr =  6e-7  # 6e-6 # 6e-5  
 
-    # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
+    chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
     # chopping_percentile = 0.0041  # kidney_2
-    chopping_percentile = 0.0027  # kidney_3_sparse
+    # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
     # chopping_percentile = 0.003  # avg
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
@@ -99,9 +99,9 @@ class CFG:
     # data_root = '/root/autodl-tmp'
 
     paths = [
-        # f"{data_root}/train/kidney_1_dense",
+        f"{data_root}/train/kidney_1_dense",
         # f"{data_root}/train/kidney_2",
-        f"{data_root}/train/kidney_3_sparse",
+        # f"{data_root}/train/kidney_3_sparse",
 
         # f"{data_root}/train/kidney_3_dense",
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
