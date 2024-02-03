@@ -72,6 +72,8 @@ class CFG:
     num_workers = 2
 
     epochs = 15 # 20/40  # 训练轮数
+
+    milestones = [5,10]
     
     lr = 6e-6 # 6e-5  # 学习率
 
@@ -674,7 +676,7 @@ if __name__=='__main__':
     # 难以实现warm-up，但如果模型已经具备一定的能力，就无需warm-up了
     scheduler = tc.optim.lr_scheduler.MultiStepLR(
         optimizer, 
-        milestones=[5,10], 
+        milestones=CFG.milestones, 
         gamma=0.1,
         last_epoch=-1
     )
