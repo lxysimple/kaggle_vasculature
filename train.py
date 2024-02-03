@@ -85,7 +85,7 @@ class CFG:
     # chopping_percentile = 0.0062  # kidney_1_denses
     # chopping_percentile = 0.0041  # kidney_1_denses
     # chopping_percentile = 0.0027  # kidney_3_sparse
-    chopping_percentile = 0.00149   # 0.012 # kidney_1_voi
+    chopping_percentile = 0.012 # kidney_1_voi ,这个数据集已经最优了，无法再优化
     # chopping_percentile = 0.0022  # kidney_3_dense
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_4_loss0.21_score0.69_val_loss0.18_val_score0.85.pt'
