@@ -75,7 +75,7 @@ class CFG:
     
     lr = 6e-5 # 6e-5  # 学习率
 
-    chopping_percentile = 1e-3  # 切割百分比
+    chopping_percentile = 0.0062  # kidney_1_denses
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
