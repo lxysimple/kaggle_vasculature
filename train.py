@@ -84,9 +84,9 @@ class CFG:
 
     paths = [
                 f"{data_root}/train/kidney_1_dense",
-                f"{data_root}/train/kidney_1_voi",
-                f"{data_root}/train/kidney_2",
-                f"{data_root}/train/kidney_3_sparse",
+                # f"{data_root}/train/kidney_1_voi",
+                # f"{data_root}/train/kidney_2",
+                # f"{data_root}/train/kidney_3_sparse",
 
                 # f"{data_root}/train/kidney_3_dense",
             ]
@@ -130,7 +130,7 @@ class CFG:
 # ============================ the model ============================
 
 class Unet(SegmentationModel):
-    
+
     def __init__(
         self,
         encoder_name: str = "maxvit_base_tf_512",
