@@ -80,22 +80,22 @@ class CFG:
     lr =  6e-6
     # lr =  6e-7  # 6e-6 # 6e-5  
 
-    chopping_percentile = 0.0062  # kidney_1_denses
-    # chopping_percentile = 0.0041  # kidney_2
+    # chopping_percentile = 0.0062  # kidney_1_denses
+    chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.012   # kidney_1_voi
     # chopping_percentile = 0.0022  # kidney_3_dense
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_1_loss0.25_score0.62_val_loss0.26_val_score0.75.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d_3_loss0.19_score0.67_val_loss0.21_val_score0.82.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
     # data_root = '/root/autodl-tmp'
 
     paths = [
-        f"{data_root}/train/kidney_1_dense",
+        # f"{data_root}/train/kidney_1_dense",
         # f"{data_root}/train/kidney_1_voi",
-        # f"{data_root}/train/kidney_2",
+        f"{data_root}/train/kidney_2",
         # f"{data_root}/train/kidney_3_sparse",
 
         # f"{data_root}/train/kidney_3_dense",
