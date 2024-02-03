@@ -150,6 +150,7 @@ class CFG:
 # ============================ the model ============================
 
 # 开源的那个0.859模型请不要用修改的Unet
+# 从老师服务器上下载的模型用这个修改的Unet
 class Unet(SegmentationModel):
 
     def __init__(
