@@ -364,7 +364,7 @@ class Data_loader(Dataset):
         # 获取数据集中指定索引的样本
         img = cv2.imread(self.paths[index], cv2.IMREAD_GRAYSCALE)  # 读取灰度图像
         img = to_size_size(img , image_size = CFG.image_size ) # my code
-        img = tc.from_numpy(img)  # 将图像转换为PyTorch张量
+        img = tc.from_numpy(img.copy())  # 将图像转换为PyTorch张量
 
         if self.is_label:
             # 如果是标签数据，将非零像素值设为255（二值化）
