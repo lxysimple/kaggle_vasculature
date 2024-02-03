@@ -149,6 +149,7 @@ class CFG:
 
 # ============================ the model ============================
 
+# 开源的那个0.859模型请不要用修改的Unet
 class Unet(SegmentationModel):
 
     def __init__(
@@ -200,7 +201,9 @@ class Unet(SegmentationModel):
             labels = self.classification_head(features[-1])
             return masks, labels
 
-        return masks        
+        return masks   
+
+
 class CustomModel(nn.Module):
     def __init__(self, CFG, weight=None):
         super().__init__()
