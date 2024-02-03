@@ -73,9 +73,10 @@ class CFG:
 
     epochs = 10 # 20/40  # 训练轮数
 
-    milestones = [5,8]
+    # milestones = [5,8]
+    milestones = [4,8]
     
-    lr = 6e-6 # 6e-5  # 学习率
+    lr =  6e-7  # 6e-6 # 6e-5  # 学习率
 
     # chopping_percentile = 0.0062  # kidney_1_denses
     # chopping_percentile = 0.012 # kidney_1_voi
