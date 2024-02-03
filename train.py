@@ -92,7 +92,7 @@ class CFG:
     # chopping_percentile = 0.003  # avg
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/best_Unet_resnext50_32x4d_size1024_epoch41_val_score_0.9381.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/resnext50_32x4d_1_loss0.17_score0.70_val_loss0.11_val_score0.94.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
@@ -566,6 +566,87 @@ class Kaggld_Dataset(Dataset):
                         y = y.flip(dims=(i - 1,))
         return x, y  # 返回处理后的图像数据，类型为(uint8, uint8)
 
+# =============== Cutmix, Mixup, and It's Loss Function ===============
+    
+
+# size是图片的shape，即（b,c,w,h）
+# lam 参数的作用是调整融合区域的大小，lam 越接近 1，融合框越小，融合程度越低
+# 返回一个随机生成的矩形框，用于确定两张图像的融合区域
+def rand_bbox(size, lam):
+    W = size[2]
+    H = size[3]
+    cut_rat = np.sqrt(1. - lam)
+    cut_w = np.int(W * cut_rat)
+    cut_h = np.int(H * cut_rat)
+
+    # uniform
+    cx = np.random.randint(W)
+    cy = np.random.randint(H)
+
+    bbx1 = np.clip(cx - cut_w // 2, 0, W)
+    bby1 = np.clip(cy - cut_h // 2, 0, H)
+    bbx2 = np.clip(cx + cut_w // 2, 0, W)
+    bby2 = np.clip(cy + cut_h // 2, 0, H)
+
+    return bbx1, bby1, bbx2, bby2
+
+# data:(b,c,w,h)
+# targets1~3:(b,),说明每张图中有3类目标
+# alpha,两张图片融合区域的大小
+# 返回这b个图随机两两融合的结果data:(b,c,w,h),和融合结果的标签
+# 我感觉融合结果的标签类别1应该是(targets1 + shuffled_targets1),类别2、3同理
+def cutmix(data, targets1, alpha):
+    # 对b这个维度进行随机打乱,产生随机序列indices
+    indices = tc.randperm(data.size(0))
+    shuffled_data = data[indices] # 这是打乱b后的数据,shape=(b,c,w,h)
+    shuffled_targets1 = targets1[indices] # 同上shape=(b,)
+
+    
+    # 基于 alpha 随机生成 lambda 值，它控制了两个图像的融合程度
+    lam = np.random.beta(alpha, alpha)
+    
+    # 随机生成一个矩形框 (bbx1, bby1) 和 (bbx2, bby2)，用于融合两张图像的区域
+    bbx1, bby1, bbx2, bby2 = rand_bbox(data.size(), lam)
+    
+    # 使用另一张图像的相应区域替换第一张图像的相应区域，实现图像融合
+    data[:, :, bbx1:bbx2, bby1:bby2] = data[indices, :, bbx1:bbx2, bby1:bby2]
+    
+    # adjust lambda to exactly match pixel ratio
+    # λ = 1 - (融合区域的像素数量 / 总图像像素数量)
+    # 基于现实对已给的λ进行一个调整
+    lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (data.size()[-1] * data.size()[-2]))
+
+    targets = [targets1, shuffled_targets1, lam]
+    return data, targets
+
+# 我感觉输入参数和输出参数含义同上
+def mixup(data, targets1, alpha):
+    indices = tc.randperm(data.size(0))
+    shuffled_data = data[indices]
+    shuffled_targets1 = targets1[indices]
+
+    lam = np.random.beta(alpha, alpha)
+    data = data * lam + shuffled_data * (1 - lam) # 我感觉是对于每个像素点都做该算法
+    targets = [targets1, shuffled_targets1, lam]
+
+    return data, targets
+
+# 被我猜中了，这里是1张图3个目标，因为经过cutmix，每个目标变得半人半马，于是求每个目标loss时需要用到2个标签，最后该图片的总loss是3个目标的loss和
+# preds1~3是预测出图中3个目标，对其softmax的概率向量
+# targets中有6个标签，其中2个为1组，代表一个目标的类别，最后一个是lam，代表cutmix的程度，求loss时可做半人半马的权重
+def cutmix_criterion(preds1, targets):
+    targets1, targets2, lam = targets[0], targets[1], targets[2]
+    criterion = DiceLoss()
+    return lam * criterion(preds1, targets1) + (1 - lam) * criterion(preds1, targets2)
+
+# 同上
+def mixup_criterion(preds1, targets):
+    targets1, targets2, lam = targets[0], targets[1], targets[2]
+    criterion = DiceLoss()
+    return lam * criterion(preds1, targets1) + (1 - lam) * criterion(preds1, targets2) 
+
+
+
 # ============================ the main ============================
 
 if __name__=='__main__':
@@ -728,10 +809,40 @@ if __name__=='__main__':
             x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
             x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
             
+            random_number = random.random() # 生成一个0到1之间的随机数
+            if random_number < 0.3:
+                input,targets=cutmix(input,target,0.2)
+                targets[0]=torch.tensor(targets[0]).cuda()
+                targets[1]=torch.tensor(targets[1]).cuda()
+                targets[2]=torch.tensor(targets[2]).cuda()
+            elif random_number > 0.7:
+                input,targets=mixup(input,target,0.2)
+                targets[0]=torch.tensor(targets[0]).cuda()
+                targets[1]=torch.tensor(targets[1]).cuda()
+                targets[2]=torch.tensor(targets[2]).cuda()
+            else:
+                None
+            input = input.cuda()
+            target = target.cuda()
+
+
             # 使用自动混合精度进行前向传播和损失计算
             with autocast(): # 计算加速，适应一些比较好的GPU
-                pred = model(x)
-                loss = loss_fc(pred, y)
+                output = model(x)
+
+                loss=None
+                if random_number < 0.3:
+                    loss = cutmix_criterion(output, targets) # 注意这是在CPU上运算的
+                elif random_number > 0.7:
+                    loss = mixup_criterion(output, targets) # 注意这是在CPU上运算的
+                else:
+                    loss = criterion(output, target)
+
+            
+            # # 使用自动混合精度进行前向传播和损失计算
+            # with autocast(): # 计算加速，适应一些比较好的GPU
+            #     pred = model(x)
+            #     loss = loss_fc(pred, y)
             
             # 反向传播和优化
             scaler.scale(loss).backward()
