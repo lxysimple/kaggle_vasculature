@@ -567,16 +567,16 @@ if __name__=='__main__':
             paths_y=glob(f"{path2}/labels/*")
             paths_x=[x.replace("labels","images").replace("dense","sparse") for x in paths_y]
             x=load_data(paths_x,is_label=False)
-            print(x.shape)
+
             y=load_data(paths_y,is_label=True)
-            print(y.shape)
+
             train_x.append(x)
             train_y.append(y)        
         else:
             x=load_data(glob(f"{path}/images/*"),is_label=False)
-            print(x.shape)
+
             y=load_data(glob(f"{path}/labels/*"),is_label=True)
-            print(y.shape)
+ 
             train_x.append(x)
             train_y.append(y)
 
@@ -587,7 +587,7 @@ if __name__=='__main__':
         # # 每次加载一个数据集，也是一个3D肾
         # # 这里90%已经被自动排序了
         # x = load_data(glob(f"{path}/images/*"), is_label=False)
-        ptint(path)
+        print(path)
         print("train dataset x shape:", x.shape)
         
         # # 加载标签数据
