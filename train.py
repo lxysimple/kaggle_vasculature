@@ -65,39 +65,39 @@ class CFG:
     model_name = 'Unet'
 
     # backbone = 'se_resnext50_32x4d'
-    backbone = 'resnext50_32x4d'
-    # backbone = 'tu-maxvit_base_tf_512'
+    # backbone = 'resnext50_32x4d'
+    backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'hrnet_w32'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 1024 # 896/512/1024/1280  # 图片大小 
-    input_size = 1024 # 896/512/1024/1280  # 输入尺寸
+    image_size = 512 # 896/512/1024/1280  # 图片大小 
+    input_size = 512 # 896/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 32 # 16 # 训练批量大小
+    train_batch_size = 8 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 32 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 12 # 20/40  # 训练轮数
+    epochs = 10 # 20/40  # 训练轮数
 
-    milestones = [6,10] 
+    # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
     # milestones = [4,8] # kidney_1_denses
     # milestones = [7,14] 
 
     # 学习率
-    lr =  6e-7
+    lr =  6e-5
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
     # chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
-    chopping_percentile = 0.003  # avg kidney_1_dense+kidney_2+kidney_3_sparse
+    chopping_percentile = 1e-3  
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/resnext50_32x4d_1_loss0.17_score0.70_val_loss0.11_val_score0.94.pt'
