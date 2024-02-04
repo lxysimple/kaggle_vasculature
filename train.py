@@ -81,7 +81,7 @@ class CFG:
     num_workers = 32 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 6 # 20/40  # 训练轮数
+    epochs = 8 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
@@ -97,28 +97,28 @@ class CFG:
     # chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
-    # chopping_percentile = 1e-3  
-    chopping_percentile = (0.0062+0.0022)/2
+    chopping_percentile = 1e-3  
+    # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.19_score0.74_val_loss0.12_val_score0.90.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.1776_score0.74_val_loss0.12_val_score0.90.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
 
     paths = [
         f"{data_root}/train/kidney_1_dense",
-        # f"{data_root}/train/kidney_2",
-        # f"{data_root}/train/kidney_3_sparse",
+        f"{data_root}/train/kidney_2",
+        f"{data_root}/train/kidney_3_sparse",
         f"{data_root}/train/kidney_3_dense",
 
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
     ]
 
     # 验证集路径
-    # valid_path = f"{data_root}/train/kidney_1_voi"
+    valid_path = f"{data_root}/train/kidney_1_voi"
     # valid_path = f"{data_root}/train/kidney_3_dense"
-    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
