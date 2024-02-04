@@ -85,7 +85,7 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
-    lr =  6e-8
+    lr =  6e-6
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -816,13 +816,8 @@ if __name__=='__main__':
             random_number = random.random() # 生成一个0到1之间的随机数
             target = y
             input = x
-            if random_number < 0.3:
+            if random_number < 0.5:
                 input,targets=cutmix(input,target,0.2)
-                targets[0]=(targets[0]).clone().detach().cuda()
-                targets[1]=(targets[1]).clone().detach().cuda()
-                targets[2]=tc.Tensor([targets[2]]).clone().detach().cuda()
-            elif random_number > 0.7:
-                input,targets=mixup(input,target,0.2)
                 targets[0]=(targets[0]).clone().detach().cuda()
                 targets[1]=(targets[1]).clone().detach().cuda()
                 targets[2]=tc.Tensor([targets[2]]).clone().detach().cuda()
@@ -832,10 +827,8 @@ if __name__=='__main__':
             with autocast(): # 计算加速，适应一些比较好的GPU
                 output = model(input)
                 loss=None
-                if random_number < 0.3:
+                if random_number < 0.5:
                     loss = cutmix_criterion(output, targets) # 注意这是在CPU上运算的
-                elif random_number > 0.7:
-                    loss = mixup_criterion(output, targets) # 注意这是在CPU上运算的
                 else:
                     loss = loss_fc(output, target)
             pred = output
