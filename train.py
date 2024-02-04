@@ -68,15 +68,15 @@ class CFG:
 
     # ============== 训练配置 =============
     """
-    864 - 216 - 16 要被64整除
+    要被128整除
     """
 
     # Expected image height and width divisible by 32.
-    image_size = 832 # 896/768/512/1024/1280  # 图片大小 
-    input_size = 832 # 896/768/512/1024/1280  # 输入尺寸
+    image_size = 512 # 896/768/512/1024/1280  # 图片大小 
+    input_size = 512 # 896/768/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 8 # 16 # 训练批量大小
+    train_batch_size = 12 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 32 # 2
 
