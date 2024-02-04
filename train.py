@@ -6,7 +6,7 @@
 注意点：
     Unet是否改动
     加了cutmix，计算训练集得分可能有所偏差，但还是和以前呈正相关
-    
+
 """
 
 
@@ -90,7 +90,7 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
-    lr =  6e-6
+    lr =  6e-7
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
