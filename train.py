@@ -128,10 +128,10 @@ class CFG:
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
 
-        # my code
-        # 只有当input_size很大时才开启，这样随机裁剪就失效了
-        # 我感觉reshape=1280非常好，很近似测试集，若(1928, 1928)reshape到1280,提供缩小的数据≈test肾刚开始的切片
-        A.Resize(height=input_size, width=input_size, p=1),
+        # # my code
+        # # 只有当input_size很大时才开启，这样随机裁剪就失效了
+        # # 我感觉reshape=1280非常好，很近似测试集，若(1928, 1928)reshape到1280,提供缩小的数据≈test肾刚开始的切片
+        # A.Resize(height=input_size, width=input_size, p=1),
 
         A.Rotate(limit=45, p=0.5),  # 旋转
         A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=p_augm),  # 随机缩放
