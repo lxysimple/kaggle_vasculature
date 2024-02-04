@@ -76,6 +76,7 @@ class CFG:
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 4 # 2
 
+    # 同一阶段学习率7个epoch后必然过拟合，无论什么模型
     epochs = 20 # 20/40  # 训练轮数
 
     
