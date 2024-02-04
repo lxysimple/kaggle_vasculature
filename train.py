@@ -853,18 +853,12 @@ if __name__=='__main__':
             optimizer.zero_grad()
             # scheduler.step()
             
-            score = 0
-            # 只计算没经过citmix和mixpu的得分
-            if random_number>=0.3 and random_number<=0.7:
-                # 计算并更新平均损失和分数
-                score = dice_coef(pred.detach(), y)
-                losss = (losss * i + loss.item()) / (i + 1)
-                scores = (scores * i + score) / (i + 1)
+
             
-            # # 计算并更新平均损失和分数
-            # score = dice_coef(pred.detach(), y)
-            # losss = (losss * i + loss.item()) / (i + 1)
-            # scores = (scores * i + score) / (i + 1)
+            # 计算并更新平均损失和分数
+            score = dice_coef(pred.detach(), y) # 感觉这样计算score分普遍偏低了
+            losss = (losss * i + loss.item()) / (i + 1)
+            scores = (scores * i + score) / (i + 1)
 
             if i == len(train_dataset)-1:
                 print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},epoch:{epoch},loss:{losss:.4f},score:{scores:.4f},lr{optimizer.param_groups[0]['lr']:.4e}")
