@@ -853,8 +853,6 @@ if __name__=='__main__':
             optimizer.zero_grad()
             # scheduler.step()
             
-
-            
             # 计算并更新平均损失和分数
             score = dice_coef(pred.detach(), y) # 感觉这样计算score分普遍偏低了
             losss = (losss * i + loss.item()) / (i + 1)
