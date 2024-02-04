@@ -737,9 +737,9 @@ if __name__=='__main__':
     # 加载验证集图像和标签数据
     print()
     print(CFG.valid_path)
-    val_x = load_data(paths_x, is_label=False)
+    val_x = load_data(paths_x[900:], is_label=False)
     print("validate dataset x shape:", val_x.shape)
-    val_y = load_data(paths_y, is_label=True)
+    val_y = load_data(paths_y[900:], is_label=True)
     print("validate dataset y shape:", val_y.shape)	
     print()
 
