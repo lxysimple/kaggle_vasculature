@@ -77,12 +77,12 @@ class CFG:
     input_size = 1024 # 896/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 32 # 16 # 训练批量大小
+    train_batch_size = 36 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
-    num_workers = 32 # 2
+    num_workers = 48 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 8 # 20/40  # 训练轮数
+    epochs = 6 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
@@ -90,7 +90,7 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
-    lr =  6e-6
+    lr =  6e-8
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -101,10 +101,10 @@ class CFG:
     chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/root/xy/resnext50_32x4d_0_loss0.17_score0.74_val_loss0.20_val_score0.67.pt'
+    checkpint = '/root/xy/resnext50_32x4d_1_loss0.20_score0.71_val_loss0.11_val_score0.9452.pt'
 
-    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
-    # data_root = '/root/autodl-tmp'
+    # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    data_root = '/root/autodl-tmp'
 
     paths = [
         f"{data_root}/train/kidney_1_dense",
@@ -738,9 +738,9 @@ if __name__=='__main__':
     # 加载验证集图像和标签数据
     print()
     print(CFG.valid_path)
-    val_x = load_data(paths_x, is_label=False)
+    val_x = load_data(paths_x[900:], is_label=False)
     print("validate dataset x shape:", val_x.shape)
-    val_y = load_data(paths_y, is_label=True)
+    val_y = load_data(paths_y[900:], is_label=True)
     print("validate dataset y shape:", val_y.shape)	
     print()
 
@@ -896,12 +896,12 @@ if __name__=='__main__':
 
         if val_scores > best_score:
             best_score = val_scores
-            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
             # tc.save(model.module.state_dict(), "./best_score.pt")
             
         if val_losss < best_valid:
             best_valid = val_losss
-            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
             # tc.save(model.module.state_dict(), "./best_loss.pt")
 
-tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
