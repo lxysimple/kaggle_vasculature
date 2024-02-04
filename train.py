@@ -89,7 +89,7 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
-    lr =  6e-6
+    lr =  6e-7
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -100,7 +100,7 @@ class CFG:
     chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_2_loss0.19_score0.75_val_loss0.15_val_score0.74.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.19_score0.74_val_loss0.12_val_score0.90.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
