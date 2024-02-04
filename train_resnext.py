@@ -1,6 +1,11 @@
 """
-    version1:
-        去掉了3轴相切，只做
+和baseline不同之处：
+    验证集数据增强不一样，baseline验证集没有裁剪图片
+    因为数据增强有裁剪，所以去掉了随机裁剪，我感觉把一张图依次裁剪完整别随机裁，可能更好
+
+注意点：
+    Unet是否改动
+    加了cutmix，计算训练集得分可能有所偏差，但还是和以前呈正相关
 
 """
 
@@ -60,24 +65,24 @@ class CFG:
     model_name = 'Unet'
 
     # backbone = 'se_resnext50_32x4d'
-    # backbone = 'resnext50_32x4d'
-    backbone = 'tu-maxvit_base_tf_512'
+    backbone = 'resnext50_32x4d'
+    # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'hrnet_w32'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
     # Expected image height and width divisible by 32.
-    image_size = 768 # 896/768/512/1024/1280  # 图片大小 
-    input_size = 768 # 896/768/512/1024/1280  # 输入尺寸
+    image_size = 1024 # 896/512/1024/1280  # 图片大小 
+    input_size = 1024 # 896/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 8 # 16 # 训练批量大小
+    train_batch_size = 32 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 32 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 12 # 20/40  # 训练轮数
+    epochs = 8 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
@@ -92,11 +97,11 @@ class CFG:
     # chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
-    # chopping_percentile = 1e-3  
+    # chopping_percentile = 1e-3 
     chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_2_loss0.19_score0.75_val_loss0.15_val_score0.74.pt'
+    checkpint = '/root/xy/resnext50_32x4d_0_loss0.17_score0.74_val_loss0.20_val_score0.67.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
