@@ -90,14 +90,14 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
-    lr =  6e-6
+    lr =  6e-7
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
     # chopping_percentile = 0.0041  # kidney_2
-    chopping_percentile = 0.0027  # kidney_3_sparse
+    # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
-    # chopping_percentile = 0.0043  # avg kidney_1_dense+kidney_2+kidney_3_sparse
+    chopping_percentile = 0.003  # avg kidney_1_dense+kidney_2+kidney_3_sparse
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/resnext50_32x4d_1_loss0.17_score0.70_val_loss0.11_val_score0.94.pt'
@@ -107,8 +107,8 @@ class CFG:
     # data_root = '/root/autodl-tmp'
 
     paths = [
-        # f"{data_root}/train/kidney_1_dense",
-        # f"{data_root}/train/kidney_2",
+        f"{data_root}/train/kidney_1_dense",
+        f"{data_root}/train/kidney_2",
         f"{data_root}/train/kidney_3_sparse",
 
         # f"{data_root}/train/kidney_3_dense",
