@@ -723,8 +723,6 @@ if __name__=='__main__':
             train_x.append(x.permute(2, 0, 1))
             train_y.append(y.permute(2, 0, 1))
     
-    
-
     # 获取验证集图像和标签路径列表
     paths_y = glob(f"{CFG.valid_path}/labels/*")
 
