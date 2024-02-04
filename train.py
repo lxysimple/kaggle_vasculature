@@ -118,7 +118,7 @@ class CFG:
     valid_id = 1  # 验证集编号
 
     # ============== 数据增强 =============
-
+    p_augm = 0.05 #0.5
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
 
@@ -128,16 +128,16 @@ class CFG:
         A.Resize(height=input_size, width=input_size, p=1),
 
         A.Rotate(limit=45, p=0.5),  # 旋转
-        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=0.5),  # 随机缩放
+        A.RandomScale(scale_limit=(0.8, 1.25), interpolation=cv2.INTER_CUBIC, p=p_augm),  # 随机缩放
 
         # 这里是输入模型训练的裁剪
         A.RandomCrop(input_size, input_size, p=1),  # 随机裁剪
 
-        A.RandomGamma(p=0.75),  # 随机Gamma变换
-        A.RandomBrightnessContrast(p=0.5, ),  # 随机亮度对比度变换
-        A.GaussianBlur(p=0.5),  # 高斯模糊
-        A.MotionBlur(p=0.5),  # 运动模糊
-        A.GridDistortion(num_steps=5, distort_limit=0.3, p=0.5),  # 网格扭曲
+        A.RandomGamma(p=p_augm*2/3),  # 随机Gamma变换
+        A.RandomBrightnessContrast(p=p_augm, ),  # 随机亮度对比度变换
+        A.GaussianBlur(p=p_augm),  # 高斯模糊
+        A.MotionBlur(p=p_augm),  # 运动模糊
+        A.GridDistortion(num_steps=5, distort_limit=0.3, p=p_augm),  # 网格扭曲
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
@@ -152,60 +152,60 @@ class CFG:
 
 # ============================ the model ============================
 
-# 开源的那个0.859模型请不要用修改的Unet
-# 从老师服务器上下载的模型用这个修改的Unet
-class Unet(SegmentationModel):
+# # 开源的那个0.859模型请不要用修改的Unet
+# # 从老师服务器上下载的模型用这个修改的Unet
+# class Unet(SegmentationModel):
 
-    def __init__(
-        self,
-        encoder_name: str = "maxvit_base_tf_512",
-        encoder_pretrain = True,
-        decoder_use_batchnorm: bool = True,
-        decoder_channels: List[int] = (256, 128, 64, 32, 16),
-        decoder_attention_type: Optional[str] = None,
-        in_channels: int = 1,
-        classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
-        aux_params: Optional[dict] = None,
-    ):
-        super().__init__()
-        if encoder_name == "maxvit_base_tf_512":
-            self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-            encoder_out_channels = [1,64,96,192,384,768]
-        self.decoder = UnetDecoder(
-            encoder_channels= encoder_out_channels,
-            decoder_channels=decoder_channels,
-            n_blocks=5,
-            use_batchnorm=decoder_use_batchnorm,
-            center=True if encoder_name.startswith("vgg") else False,
-            attention_type=decoder_attention_type,
-        )
-        self.segmentation_head = SegmentationHead(
-            in_channels=16,
-            out_channels=classes,
-            activation=activation,
-            kernel_size=3,
-        )
+#     def __init__(
+#         self,
+#         encoder_name: str = "maxvit_base_tf_512",
+#         encoder_pretrain = True,
+#         decoder_use_batchnorm: bool = True,
+#         decoder_channels: List[int] = (256, 128, 64, 32, 16),
+#         decoder_attention_type: Optional[str] = None,
+#         in_channels: int = 1,
+#         classes: int = 1,
+#         activation: Optional[Union[str, callable]] = None,
+#         aux_params: Optional[dict] = None,
+#     ):
+#         super().__init__()
+#         if encoder_name == "maxvit_base_tf_512":
+#             self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
+#             encoder_out_channels = [1,64,96,192,384,768]
+#         self.decoder = UnetDecoder(
+#             encoder_channels= encoder_out_channels,
+#             decoder_channels=decoder_channels,
+#             n_blocks=5,
+#             use_batchnorm=decoder_use_batchnorm,
+#             center=True if encoder_name.startswith("vgg") else False,
+#             attention_type=decoder_attention_type,
+#         )
+#         self.segmentation_head = SegmentationHead(
+#             in_channels=16,
+#             out_channels=classes,
+#             activation=activation,
+#             kernel_size=3,
+#         )
 
-        if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
+#         if aux_params is not None:
+#             self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+#         else:
+#             self.classification_head = None
 
-        self.name = "u-{}".format(encoder_name)
-        self.initialize()
+#         self.name = "u-{}".format(encoder_name)
+#         self.initialize()
         
-    def forward(self, x):
-        features = self.encoder(x)
-        features.insert(0,x)
-        decoder_output = self.decoder(*features)
-        masks = self.segmentation_head(decoder_output)
+#     def forward(self, x):
+#         features = self.encoder(x)
+#         features.insert(0,x)
+#         decoder_output = self.decoder(*features)
+#         masks = self.segmentation_head(decoder_output)
 
-        if self.classification_head is not None:
-            labels = self.classification_head(features[-1])
-            return masks, labels
+#         if self.classification_head is not None:
+#             labels = self.classification_head(features[-1])
+#             return masks, labels
 
-        return masks   
+#         return masks   
 
 
 class CustomModel(nn.Module):
