@@ -95,7 +95,7 @@ class CFG:
     # chopping_percentile = 0.0043  # avg kidney_1_dense+kidney_2+kidney_3_sparse
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/resnext50_32x4d_1_loss0.17_score0.70_val_loss0.11_val_score0.94.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_5_loss0.35_score0.51_val_loss0.20_val_score0.85.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp/'
