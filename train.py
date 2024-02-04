@@ -852,7 +852,7 @@ if __name__=='__main__':
             optimizer.zero_grad()
             # scheduler.step()
             
-            score = -1
+            score = 0
             # 只计算没经过citmix和mixpu的得分
             if random_number>=0.3 and random_number<=0.7:
                 # 计算并更新平均损失和分数
