@@ -64,8 +64,8 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    backbone = 'se_resnext50_32x4d'
-    # backbone = 'resnext50_32x4d'
+    # backbone = 'se_resnext50_32x4d'
+    backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'hrnet_w32'
 
