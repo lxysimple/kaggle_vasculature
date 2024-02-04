@@ -895,12 +895,12 @@ if __name__=='__main__':
 
         if val_scores > best_score:
             best_score = val_scores
-            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
             # tc.save(model.module.state_dict(), "./best_score.pt")
             
         if val_losss < best_valid:
             best_valid = val_losss
-            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
             # tc.save(model.module.state_dict(), "./best_loss.pt")
 
-tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.2f}_score{scores:.2f}_val_loss{val_losss:.2f}_val_score{val_scores:.2f}.pt")
+tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
