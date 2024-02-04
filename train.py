@@ -67,9 +67,13 @@ class CFG:
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
+    """
+    864 - 216 - 16 要被64整除
+    """
+
     # Expected image height and width divisible by 32.
-    image_size = 864 # 896/768/512/1024/1280  # 图片大小 
-    input_size = 864 # 896/768/512/1024/1280  # 输入尺寸
+    image_size = 832 # 896/768/512/1024/1280  # 图片大小 
+    input_size = 832 # 896/768/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     train_batch_size = 8 # 16 # 训练批量大小
