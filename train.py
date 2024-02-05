@@ -189,28 +189,27 @@ class Unet(SegmentationModel):
         )
         
         # 默认的encoder接受可变参数 目前这个就是固定参数了
-        self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-
-        self.decoder = UnetDecoder(
-            # https://github.com/qubvel/segmentation_models.pytorch/blob/6db76a1106426ac5b55f39fba68168f3bccae7f8/segmentation_models_pytorch/encoders/timm_universal.py#L25
-#             """
-#             encoder_channels= [
-#                 in_channels,
-#             ] + self.encoder.feature_info.channels(),
-#             """
-#             encoder_channels= [1] + [64, 96, 192, 384, 768],
-#             encoder_channels= [32, 64,128, 256],
-#             encoder_channels=self.encoder.out_channels,
-            encoder_channels= [ 1,64,96, 192, 384, 768],
+#         self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
+        self.decoder  = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
+#         self.decoder = UnetDecoder(
+#             # https://github.com/qubvel/segmentation_models.pytorch/blob/6db76a1106426ac5b55f39fba68168f3bccae7f8/segmentation_models_pytorch/encoders/timm_universal.py#L25
+# #             """
+# #             encoder_channels= [
+# #                 in_channels,
+# #             ] + self.encoder.feature_info.channels(),
+# #             """
+# #             encoder_channels= [1] + [64, 96, 192, 384, 768],
+# #             encoder_channels= [32, 64,128, 256],
+# #             encoder_channels=self.encoder.out_channels,
+#             encoder_channels= [ 1,64,96, 192, 384, 768],
         
-            decoder_channels=decoder_channels,
-            n_blocks=encoder_depth,
+#             decoder_channels=decoder_channels,
+#             n_blocks=encoder_depth,
             
-            use_batchnorm=decoder_use_batchnorm,
-            center=True if encoder_name.startswith("vgg") else False,
-            attention_type=decoder_attention_type,
-        )
-    
+#             use_batchnorm=decoder_use_batchnorm,
+#             center=True if encoder_name.startswith("vgg") else False,
+#             attention_type=decoder_attention_type,
+#         )
     
         self.segmentation_head = SegmentationHead(
             in_channels=decoder_channels[-1],
@@ -237,7 +236,7 @@ class Unet(SegmentationModel):
             labels = self.classification_head(features[-1])
             return masks, labels
 
-        return masks   
+        return masks    
 
 
 class CustomModel(nn.Module):
