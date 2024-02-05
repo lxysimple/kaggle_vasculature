@@ -106,14 +106,14 @@ class CFG:
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
 
-    # paths = [
-    #     f"{data_root}/train/kidney_1_dense",
-    #     f"{data_root}/train/kidney_2",
-    #     f"{data_root}/train/kidney_3_sparse",
-    #     f"{data_root}/train/kidney_3_dense",
+    paths = [
+        # f"{data_root}/train/kidney_1_dense",
+        # f"{data_root}/train/kidney_2",
+        # f"{data_root}/train/kidney_3_sparse",
+        # f"{data_root}/train/kidney_3_dense",
 
-    #     # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
-    # ]
+        # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
+    ]
 
     # 验证集路径
     # valid_path = f"{data_root}/train/kidney_1_voi"
