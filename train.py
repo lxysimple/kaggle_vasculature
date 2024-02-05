@@ -158,36 +158,58 @@ class CFG:
 
 # ============================ the model ============================
 
-# 开源的那个0.859模型请不要用修改的Unet
-# 从老师服务器上下载的模型用这个修改的Unet
 class Unet(SegmentationModel):
 
     def __init__(
         self,
-        encoder_name: str = "maxvit_base_tf_512",
-        encoder_pretrain = True,
+        encoder_name: str = "tu-maxvit_base_tf_512",
+        encoder_depth: int = 5,
+        encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: bool = True,
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         in_channels: int = 1,
-        classes: int = 1,
+        classes: int = 512,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
+        
+        
     ):
         super().__init__()
-        if encoder_name == "maxvit_base_tf_512":
-            self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-            encoder_out_channels = [1,64,96,192,384,768]
+        
+        self.encoder = get_encoder(
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
+        )
+        
+        # 默认的encoder接受可变参数 目前这个就是固定参数了
+        self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
+
         self.decoder = UnetDecoder(
-            encoder_channels= encoder_out_channels,
+            # https://github.com/qubvel/segmentation_models.pytorch/blob/6db76a1106426ac5b55f39fba68168f3bccae7f8/segmentation_models_pytorch/encoders/timm_universal.py#L25
+#             """
+#             encoder_channels= [
+#                 in_channels,
+#             ] + self.encoder.feature_info.channels(),
+#             """
+#             encoder_channels= [1] + [64, 96, 192, 384, 768],
+#             encoder_channels= [32, 64,128, 256],
+#             encoder_channels=self.encoder.out_channels,
+            encoder_channels= [ 1,64,96, 192, 384, 768],
+        
             decoder_channels=decoder_channels,
-            n_blocks=5,
+            n_blocks=encoder_depth,
+            
             use_batchnorm=decoder_use_batchnorm,
             center=True if encoder_name.startswith("vgg") else False,
             attention_type=decoder_attention_type,
         )
+    
+    
         self.segmentation_head = SegmentationHead(
-            in_channels=16,
+            in_channels=decoder_channels[-1],
             out_channels=classes,
             activation=activation,
             kernel_size=3,
@@ -219,13 +241,21 @@ class CustomModel(nn.Module):
         super().__init__()
         
         # 初始化模型，使用了 segmentation_models_pytorch 库中的 Unet 模型
-        self.model = smp.Unet(
+        # self.model = smp.Unet(
+        #     encoder_name=CFG.backbone, 
+        #     encoder_weights=weight,
+        #     in_channels=CFG.in_chans,
+        #     classes=CFG.target_size,
+        #     activation=None,
+        # )
+        self.model = Unet(
             encoder_name=CFG.backbone, 
             encoder_weights=weight,
             in_channels=CFG.in_chans,
             classes=CFG.target_size,
             activation=None,
         )
+        
 
     def forward(self, image):
         # 模型的前向传播
