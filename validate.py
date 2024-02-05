@@ -61,9 +61,9 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    # backbone = 'se_resnext50_32x4d'
+    backbone = 'se_resnext50_32x4d'
     # backbone = 'resnext50_32x4d'
-    backbone = 'tu-maxvit_base_tf_512'
+    # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'hrnet_w32'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
@@ -103,7 +103,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_2_loss0.19_score0.75_val_loss0.15_val_score0.74.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/model_real_23.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
