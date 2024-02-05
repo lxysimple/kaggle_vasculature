@@ -62,8 +62,8 @@ class CFG:
     model_name = 'Unet'
 
     # backbone = 'se_resnext50_32x4d'
-    backbone = 'resnext50_32x4d'
-    # backbone = 'tu-maxvit_base_tf_512'
+    # backbone = 'resnext50_32x4d'
+    backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'hrnet_w32'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
@@ -74,8 +74,8 @@ class CFG:
     """
 
     # Expected image height and width divisible by 32.
-    image_size = 1024 # 896/768/512/1024/1280  # 图片大小 
-    input_size = 1024 # 896/768/512/1024/1280  # 输入尺寸
+    image_size = 512 # 896/768/512/1024/1280  # 图片大小 
+    input_size = 512 # 896/768/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     train_batch_size = 8 # 16 # 训练批量大小
@@ -103,7 +103,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/resnext50_32x4d_1_loss0.17_score0.70_val_loss0.11_val_score0.94.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.179_score0.758_val_loss0.182_val_score0.711.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
