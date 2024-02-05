@@ -103,7 +103,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.179_score0.758_val_loss0.182_val_score0.711.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.1776_score0.74_val_loss0.12_val_score0.90.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
