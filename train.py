@@ -313,7 +313,7 @@ class CustomModel(nn.Module):
         # )
         self.model = Unet(
             encoder_name=CFG.backbone, 
-            encoder_weights=weight,
+            # encoder_weights=weight,
             in_channels=CFG.in_chans,
             classes=CFG.target_size,
             activation=None,
