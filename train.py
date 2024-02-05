@@ -1,7 +1,6 @@
 """
     version1:
         设置初始权重为imagenet
-        训练+验证数据只设置20个
         改了数据集路径
 
 """
@@ -108,8 +107,8 @@ class CFG:
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.1776_score0.74_val_loss0.12_val_score0.90.pt'
 
-    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
-    # data_root = '/home/xyli/kaggle'
+    # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    data_root = '/home/xyli/kaggle'
     # data_root = '/root/autodl-tmp'
 
     paths = [
@@ -714,15 +713,15 @@ if __name__=='__main__':
 
             y=load_data(paths_y,is_label=True)
 
-            train_x.append(x[0:100])
-            train_y.append(y[0:100])        
+            train_x.append(x)
+            train_y.append(y)        
         else:
             x=load_data(glob(f"{path}/images/*"),is_label=False)
 
             y=load_data(glob(f"{path}/labels/*"),is_label=True)
  
-            train_x.append(x[0:100])
-            train_y.append(y[0:100])
+            train_x.append(x)
+            train_y.append(y)
 
         # # 排除特定路径, but I think it will not be run.
         # if path == f"{CFG.data_root}/train/kidney_3_dense":    
@@ -767,9 +766,9 @@ if __name__=='__main__':
     # 加载验证集图像和标签数据
     print()
     print(CFG.valid_path)
-    val_x = load_data(paths_x[0:100], is_label=False)
+    val_x = load_data(paths_x, is_label=False)
     print("validate dataset x shape:", val_x.shape)
-    val_y = load_data(paths_y[0:100], is_label=True)
+    val_y = load_data(paths_y, is_label=True)
     print("validate dataset y shape:", val_y.shape)	
     print()
 
