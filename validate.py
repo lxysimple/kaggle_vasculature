@@ -1,6 +1,6 @@
 """
     version1:
-        注意：vit和resnext、se_resnext输入尺寸不一样，要改一下
+        vit和resnext、se_resnext输入尺寸不一样，要改一下
         别忘记改backbone
 
 """
