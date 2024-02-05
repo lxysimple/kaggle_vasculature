@@ -181,9 +181,9 @@ class Unet(SegmentationModel):
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
-        if encoder_name == "maxvit_base_tf_512":
-            self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-            encoder_out_channels = [1,64,96,192,384,768]
+        # if encoder_name == "maxvit_base_tf_512":
+        self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
+        encoder_out_channels = [1,64,96,192,384,768]
         self.decoder = UnetDecoder(
             encoder_channels= encoder_out_channels,
             decoder_channels=decoder_channels,
