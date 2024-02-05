@@ -164,64 +164,6 @@ class CFG:
 
 # ============================ the model ============================
 
-
-
-class Unet(SegmentationModel):
-
-    def __init__(
-        self,
-        encoder_name: str = "maxvit_base_tf_512",
-        encoder_pretrain = True,
-        decoder_use_batchnorm: bool = True,
-        decoder_channels: List[int] = (256, 128, 64, 32, 16),
-        decoder_attention_type: Optional[str] = None,
-        in_channels: int = 1,
-        classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
-        aux_params: Optional[dict] = None,
-    ):
-        super().__init__()
-        # if encoder_name == "maxvit_base_tf_512":
-        self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-        encoder_out_channels = [1,64,96,192,384,768]
-        self.decoder = UnetDecoder(
-            encoder_channels= encoder_out_channels,
-            decoder_channels=decoder_channels,
-            n_blocks=5,
-            use_batchnorm=decoder_use_batchnorm,
-            center=True if encoder_name.startswith("vgg") else False,
-            attention_type=decoder_attention_type,
-        )
-        self.segmentation_head = SegmentationHead(
-            in_channels=16,
-            out_channels=classes,
-            activation=activation,
-            kernel_size=3,
-        )
-
-        if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
-
-        self.name = "u-{}".format(encoder_name)
-        self.initialize()
-        
-    def forward(self, x):
-        features = self.encoder(x)
-        features.insert(0,x)
-        decoder_output = self.decoder(*features)
-        masks = self.segmentation_head(decoder_output)
-
-        if self.classification_head is not None:
-            labels = self.classification_head(features[-1])
-            return masks, labels
-
-        return masks    
-
-
-
-
 # class Unet(SegmentationModel):
 
 #     def __init__(
@@ -304,20 +246,14 @@ class CustomModel(nn.Module):
         super().__init__()
         
         # 初始化模型，使用了 segmentation_models_pytorch 库中的 Unet 模型
-        # self.model = smp.Unet(
-        #     encoder_name=CFG.backbone, 
-        #     encoder_weights=weight,
-        #     in_channels=CFG.in_chans,
-        #     classes=CFG.target_size,
-        #     activation=None,
-        # )
-        self.model = Unet(
+        self.model = smp.Unet(
             encoder_name=CFG.backbone, 
-            # encoder_weights=weight,
+            encoder_weights=weight,
             in_channels=CFG.in_chans,
             classes=CFG.target_size,
             activation=None,
         )
+
         
 
     def forward(self, image):
