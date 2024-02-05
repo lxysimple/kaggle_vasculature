@@ -107,7 +107,8 @@ class CFG:
 
     # checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.1776_score0.74_val_loss0.12_val_score0.90.pt'
 
-    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    data_root = '/home/xyli/kaggle'
     # data_root = '/root/autodl-tmp'
 
     paths = [
