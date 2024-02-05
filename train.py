@@ -99,7 +99,7 @@ class CFG:
 
     # 学习率
 
-    lr =  6e-7 # 6e-7对vit来说太小了，学不到东西
+    lr =  6e-8 # 6e-7对vit来说太小了，学不到东西
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -110,7 +110,7 @@ class CFG:
     chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/best_Unet_timm-regnety_064_size1024_epoch34_val_score_0.9110.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/timm-regnety_064_5_loss0.165_score0.737_val_loss0.101_val_score0.897.pt'
 
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     data_root = '/home/xyli/kaggle'
