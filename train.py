@@ -720,15 +720,15 @@ if __name__=='__main__':
 
             y=load_data(paths_y,is_label=True)
 
-            train_x.append(x[0:20])
-            train_y.append(y[0:20])        
+            train_x.append(x[0:100])
+            train_y.append(y[0:100])        
         else:
             x=load_data(glob(f"{path}/images/*"),is_label=False)
 
             y=load_data(glob(f"{path}/labels/*"),is_label=True)
  
-            train_x.append(x[0:20])
-            train_y.append(y[0:20])
+            train_x.append(x[0:100])
+            train_y.append(y[0:100])
 
         # # 排除特定路径, but I think it will not be run.
         # if path == f"{CFG.data_root}/train/kidney_3_dense":    
@@ -773,9 +773,9 @@ if __name__=='__main__':
     # 加载验证集图像和标签数据
     print()
     print(CFG.valid_path)
-    val_x = load_data(paths_x[0:20], is_label=False)
+    val_x = load_data(paths_x[0:100], is_label=False)
     print("validate dataset x shape:", val_x.shape)
-    val_y = load_data(paths_y[0:20], is_label=True)
+    val_y = load_data(paths_y[0:100], is_label=True)
     print("validate dataset y shape:", val_y.shape)	
     print()
 
