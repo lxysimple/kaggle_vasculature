@@ -113,17 +113,17 @@ class CFG:
     # data_root = '/root/autodl-tmp'
 
     paths = [
-        # f"{data_root}/train/kidney_1_dense",
-        # f"{data_root}/train/kidney_2",
+        f"{data_root}/train/kidney_1_dense",
+        f"{data_root}/train/kidney_2",
         f"{data_root}/train/kidney_3_sparse",
-        # f"{data_root}/train/kidney_3_dense",
+        f"{data_root}/train/kidney_3_dense",
 
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
     ]
 
     # 验证集路径
-    # valid_path = f"{data_root}/train/kidney_1_voi"
-    valid_path = f"{data_root}/train/kidney_3_dense"
+    valid_path = f"{data_root}/train/kidney_1_voi"
+    # valid_path = f"{data_root}/train/kidney_3_dense"
     # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
