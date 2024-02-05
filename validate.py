@@ -2,6 +2,7 @@
     version1:
         vit和resnext、se_resnext输入尺寸不一样，要改一下
         别忘记改backbone
+        验证集是kidney_3_dense时要改下batchsize不然爆显存
 
 """
 
