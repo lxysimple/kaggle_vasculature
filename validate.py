@@ -78,7 +78,7 @@ class CFG:
     input_size = 1024 # 896/768/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 8 # 16 # 训练批量大小
+    train_batch_size = 16 # 16 # 训练批量大小
     valid_batch_size = train_batch_size * 2  # 验证批量大小
     num_workers = 32 # 2
 
@@ -118,9 +118,9 @@ class CFG:
     ]
 
     # 验证集路径
-    valid_path = f"{data_root}/train/kidney_1_voi"
+    # valid_path = f"{data_root}/train/kidney_1_voi"
     # valid_path = f"{data_root}/train/kidney_3_dense"
-    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
