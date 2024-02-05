@@ -1,6 +1,7 @@
 """
     version1:
         注意：这里是取验证集后[900:]个，又改回全数据了
+        设置初始权重为imagenet
 
 """
 
@@ -104,7 +105,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.1776_score0.74_val_loss0.12_val_score0.90.pt'
+    # checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/tu-maxvit_base_tf_512_0_loss0.1776_score0.74_val_loss0.12_val_score0.90.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
@@ -279,12 +280,12 @@ def build_model(weight="imagenet"):
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
-    # # 构建并返回模型
-    # model = CustomModel(CFG, weight)
+    # 构建并返回模型
+    model = CustomModel(CFG, weight)
 
-    # my code
-    model = CustomModel(CFG, None)
-    model.load_state_dict(tc.load(CFG.checkpint))
+    # # my code
+    # model = CustomModel(CFG, None)
+    # model.load_state_dict(tc.load(CFG.checkpint))
 
     return model.cuda()
 
