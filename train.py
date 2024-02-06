@@ -281,7 +281,8 @@ def build_model(weight="imagenet"):
     print('backbone', CFG.backbone)
 
     # # 构建并返回模型
-    model = CustomModel(CFG, weight)
+    model = CustomModel(CFG, None)
+    # model = CustomModel(CFG, weight)
 
     # # my code
     # model = CustomModel(CFG, None)
