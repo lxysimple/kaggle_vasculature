@@ -122,8 +122,8 @@ class CFG:
     ]
 
     # 验证集路径
-    # valid_path = f"{data_root}/train/kidney_1_voi"
-    valid_path = f"{data_root}/train/kidney_3_dense"
+    valid_path = f"{data_root}/train/kidney_1_voi"
+    # valid_path = f"{data_root}/train/kidney_3_dense"
     # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
