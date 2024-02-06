@@ -90,7 +90,7 @@ class CFG:
     num_workers = 48 # 48 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 8 # 20/40  # 训练轮数
+    epochs = 16 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
@@ -113,8 +113,8 @@ class CFG:
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/mit_b2_0_loss0.964_score0.131_val_loss0.879_val_score0.462.pt'
 
-    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
-    # data_root = '/home/xyli/kaggle'
+    # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    data_root = '/home/xyli/kaggle'
     # data_root = '/root/autodl-tmp'
 
     paths = [
