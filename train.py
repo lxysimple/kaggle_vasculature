@@ -1,6 +1,6 @@
 """
-    version1:
-        修改了预训练为imagenet
+    非CFG内的修改:
+
 
 """
 
@@ -62,12 +62,13 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    # backbone = 'se_resnext50_32x4d'
+    backbone = 'se_resnext50_32x4d'
     # backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
-    backbone = 'timm-hrnet_w32'
+    # backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
     # backbone = 'timm-regnety_064'
+    # backbone = 'timm-skresnext50_32x4d'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
@@ -90,7 +91,7 @@ class CFG:
     # num_workers = 48 # 48 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 16 # 20/40  # 训练轮数
+    epochs = 8 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
@@ -99,15 +100,15 @@ class CFG:
 
     # 学习率
 
-    lr =  6e-5 # 6e-7对vit来说太小了，学不到东西
+    lr =  6e-6 # 6e-7对vit来说太小了，学不到东西
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
     # chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
-    chopping_percentile = 1e-3  
-    # chopping_percentile = (0.0062+0.0022)/2
+    # chopping_percentile = 1e-3  
+    chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
     # checkpint = '/home/xyli/kaggle/kaggle_vasculature/timm-regnety_064_5_loss0.165_score0.737_val_loss0.101_val_score0.897.pt'
@@ -117,18 +118,18 @@ class CFG:
     # data_root = '/root/autodl-tmp'
 
     paths = [
-        # f"{data_root}/train/kidney_1_dense",
+        f"{data_root}/train/kidney_1_dense",
         # f"{data_root}/train/kidney_2",
-        f"{data_root}/train/kidney_3_sparse",
-        # f"{data_root}/train/kidney_3_dense",
+        # f"{data_root}/train/kidney_3_sparse",
+        f"{data_root}/train/kidney_3_dense",
 
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
     ]
 
     # 验证集路径
     # valid_path = f"{data_root}/train/kidney_1_voi"
-    valid_path = f"{data_root}/train/kidney_3_dense"
-    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    # valid_path = f"{data_root}/train/kidney_3_dense"
+    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
@@ -279,12 +280,12 @@ def build_model(weight="imagenet"):
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
-    # # 构建并返回模型
-    model = CustomModel(CFG, weight)
+    # # # 构建并返回模型
+    # model = CustomModel(CFG, weight)
 
-    # # my code
-    # model = CustomModel(CFG, None)
-    # model.load_state_dict(tc.load(CFG.checkpint))
+    # my code
+    model = CustomModel(CFG, None)
+    model.load_state_dict(tc.load(CFG.checkpint))
 
     return model.cuda()
 
