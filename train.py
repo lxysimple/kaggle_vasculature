@@ -101,7 +101,7 @@ class CFG:
     # 学习率
     # lr =  6e-12 
     # lr =  6e-10 
-    lr = 6e-7 
+    lr = 6e-6 
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -112,7 +112,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_5_loss0.219_score0.662_val_loss0.924_val_score0.108.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_6_loss0.200_score0.689_val_loss0.898_val_score0.131.pt'
 
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     data_root = '/home/xyli/kaggle'
