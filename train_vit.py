@@ -1,6 +1,6 @@
 """
     version1:
-        改了用imagenet预训练模型
+
 
 """
 
