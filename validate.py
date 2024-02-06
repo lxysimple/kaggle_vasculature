@@ -62,11 +62,11 @@ class CFG:
     model_name = 'Unet'
 
     # backbone = 'se_resnext50_32x4d'
-    # backbone = 'resnext50_32x4d'
+    backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'hrnet_w32'
     # backbone = 'mit_b2'
-    backbone = 'timm-regnety_064'
+    # backbone = 'timm-regnety_064'
     
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
@@ -106,7 +106,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/timm-regnety_064_0_loss0.151_score0.782_val_loss0.103_val_score0.899.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/resnext50_32x4d_3_loss0.178_score0.722_val_loss0.167_val_score0.711.pt'
     
     data_root = '/home/xyli/kaggle'
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
@@ -122,9 +122,9 @@ class CFG:
     ]
 
     # 验证集路径
-    valid_path = f"{data_root}/train/kidney_1_voi"
+    # valid_path = f"{data_root}/train/kidney_1_voi"
     # valid_path = f"{data_root}/train/kidney_3_dense"
-    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
