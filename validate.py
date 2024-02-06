@@ -104,7 +104,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_5_loss0.219_score0.662_val_loss0.924_val_score0.108.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_3_loss0.199_score0.674_val_loss0.909_val_score0.121.pt'
     
     data_root = '/home/xyli/kaggle'
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
@@ -121,8 +121,8 @@ class CFG:
 
     # 验证集路径
     # valid_path = f"{data_root}/train/kidney_1_voi"
-    # valid_path = f"{data_root}/train/kidney_3_dense"
-    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    valid_path = f"{data_root}/train/kidney_3_dense"
+    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
