@@ -113,8 +113,8 @@ class CFG:
 
     checkpint = '/home/xyli/kaggle/kaggle_vasculature/timm-skresnext50_32x4d_0_loss0.987_score0.015_val_loss0.980_val_score0.025.pt'
 
-    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
-    # data_root = '/home/xyli/kaggle'
+    # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    data_root = '/home/xyli/kaggle'
     # data_root = '/root/autodl-tmp'
 
     paths = [
