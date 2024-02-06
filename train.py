@@ -65,7 +65,7 @@ class CFG:
     # backbone = 'se_resnext50_32x4d'
     # backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
-    backbone = 'hrnet_w32'
+    backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
     # backbone = 'timm-regnety_064'
 
