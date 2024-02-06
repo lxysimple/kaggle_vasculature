@@ -90,7 +90,7 @@ class CFG:
     num_workers = 48 # 48 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 16 # 20/40  # 训练轮数
+    epochs = 8 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
@@ -100,7 +100,7 @@ class CFG:
     # 学习率
 
     # lr =  6e-7 # 6e-7对vit来说太小了，学不到东西
-    lr =  6e-5 # 6e-7对vit来说太小了，学不到东西
+    lr =  6e-6 # 6e-7对vit来说太小了，学不到东西
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -111,7 +111,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/mit_b2_0_loss0.964_score0.131_val_loss0.879_val_score0.462.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/mit_b2_5_loss0.205_score0.717_val_loss0.206_val_score0.635.pt'
 
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     data_root = '/home/xyli/kaggle'
@@ -928,14 +928,14 @@ if __name__=='__main__':
         print()
 
 
-        if val_scores > best_score:
-            best_score = val_scores
-            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
-            # tc.save(model.module.state_dict(), "./best_score.pt")
+        # if val_scores > best_score:
+        #     best_score = val_scores
+        #     tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
+        #     # tc.save(model.module.state_dict(), "./best_score.pt")
             
-        if val_losss < best_valid:
-            best_valid = val_losss
-            tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
-            # tc.save(model.module.state_dict(), "./best_loss.pt")
+        # if val_losss < best_valid:
+        #     best_valid = val_losss
+        #     tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
+        #     # tc.save(model.module.state_dict(), "./best_loss.pt")
 
-tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
+        tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
