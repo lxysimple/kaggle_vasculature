@@ -63,8 +63,8 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    backbone = 'se_resnext50_32x4d'
-    # backbone = 'resnext50_32x4d'
+    # backbone = 'se_resnext50_32x4d'
+    backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
@@ -102,7 +102,7 @@ class CFG:
     # 学习率
     # lr =  6e-16
     # lr =  6e-14
-    lr =  6e-20 
+    lr =  6e-12 
     # lr =  6e-10 
     # lr = 6e-8 
     # lr =  6e-7  # 6e-6 # 6e-5  
@@ -115,7 +115,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_6_loss0.155_score0.771_val_loss0.185_val_score0.735.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/re.pt'
 
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     data_root = '/home/xyli/kaggle'
