@@ -1,8 +1,6 @@
 """
     version1:
-        vit和resnext、se_resnext输入尺寸不一样，要改一下
-        别忘记改backbone
-        验证集是kidney_3_dense时要改下batchsize不然爆显存
+
 
 """
 
@@ -61,8 +59,8 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    # backbone = 'se_resnext50_32x4d'
-    backbone = 'resnext50_32x4d'
+    backbone = 'se_resnext50_32x4d'
+    # backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'hrnet_w32'
     # backbone = 'mit_b2'
