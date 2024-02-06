@@ -103,8 +103,8 @@ class CFG:
     # lr =  6e-16
     # lr =  6e-14
     # lr =  6e-12 
-    # lr =  6e-10 
-    lr = 6e-8 
+    lr =  6e-10 
+    # lr = 6e-8 
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
