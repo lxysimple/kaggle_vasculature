@@ -112,7 +112,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = ''
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/model_real_23.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/home/xyli/kaggle'
