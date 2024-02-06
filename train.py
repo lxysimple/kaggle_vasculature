@@ -112,7 +112,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/timm-regnety_064_0_loss0.151_score0.782_val_loss0.103_val_score0.899.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_6_loss0.155_score0.771_val_loss0.185_val_score0.735.pt'
 
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     data_root = '/home/xyli/kaggle'
