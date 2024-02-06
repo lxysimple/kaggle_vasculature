@@ -62,12 +62,12 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    # backbone = 'se_resnext50_32x4d'
+    backbone = 'se_resnext50_32x4d'
     # backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
-    backbone = 'timm-regnety_064'
+    # backbone = 'timm-regnety_064'
     # backbone = 'timm-skresnext50_32x4d'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
