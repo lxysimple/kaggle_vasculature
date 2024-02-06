@@ -62,8 +62,8 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    # backbone = 'se_resnext50_32x4d'
-    backbone = 'resnext50_32x4d'
+    backbone = 'se_resnext50_32x4d'
+    # backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
@@ -99,8 +99,9 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
-    lr =  6e-12 
-    # lr =  6e-10  
+    # lr =  6e-12 
+    # lr =  6e-10 
+    lr = 6-8 
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -111,7 +112,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/resnext50_32x4d_3_loss0.158_score0.742_val_loss0.168_val_score0.728.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_26_loss0.10_score0.90_val_loss0.12_val_score0.88_midd_1024.pt'
 
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     data_root = '/home/xyli/kaggle'
@@ -119,17 +120,17 @@ class CFG:
 
     paths = [
         f"{data_root}/train/kidney_1_dense",
-        # f"{data_root}/train/kidney_2",
-        # f"{data_root}/train/kidney_3_sparse",
+        f"{data_root}/train/kidney_2",
+        f"{data_root}/train/kidney_3_sparse",
         f"{data_root}/train/kidney_3_dense",
 
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
     ]
 
     # 验证集路径
-    # valid_path = f"{data_root}/train/kidney_1_voi"
+    valid_path = f"{data_root}/train/kidney_1_voi"
     # valid_path = f"{data_root}/train/kidney_3_dense"
-    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
