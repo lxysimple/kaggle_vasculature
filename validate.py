@@ -75,8 +75,8 @@ class CFG:
     """
 
     # Expected image height and width divisible by 32.
-    image_size = 512 # 896/768/512/1024/1280  # 图片大小 
-    input_size = 512 # 896/768/512/1024/1280  # 输入尺寸
+    image_size = 1024 # 896/768/512/1024/1280  # 图片大小 
+    input_size = 1024 # 896/768/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     train_batch_size = 32 # 16 # 训练批量大小
@@ -104,10 +104,10 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/workplace/models/se_resnext50_32x4d_2_loss0.189_score0.713_val_loss0.185_val_score0.769.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_5_loss0.183_score0.719_val_loss0.181_val_score0.732.pt'
     
-    # data_root = '/home/xyli/kaggle'
-    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    data_root = '/home/xyli/kaggle'
+    # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/root/autodl-tmp'
 
     paths = [
@@ -118,12 +118,12 @@ class CFG:
 
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
     ] 
-    
+
 
     # 验证集路径
     # valid_path = f"{data_root}/train/kidney_1_voi"
-    # valid_path = f"{data_root}/train/kidney_3_dense"
-    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    valid_path = f"{data_root}/train/kidney_3_dense"
+    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
