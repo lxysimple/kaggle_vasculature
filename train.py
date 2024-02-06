@@ -1,5 +1,6 @@
 """
-    非CFG内的修改:
+    非CFG内的修改 或 CFG内要注意点:
+        checkpoint路径会变化
 
 
 """
@@ -99,6 +100,8 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
+    # lr =  6e-16
+    # lr =  6e-14
     # lr =  6e-12 
     # lr =  6e-10 
     lr = 6e-8 
