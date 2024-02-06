@@ -1,5 +1,5 @@
 """
-    version1:
+    非CFG内的修改:
 
 
 """
@@ -44,6 +44,9 @@ from typing import Optional, Union, List
 import timm
 
 import random
+
+# Importing load_dotenv for loading environment variables
+from dotenv import load_dotenv
 # ============================ global configure ============================
 
 # 显存： 骨干网络的复杂度 vs 输入尺寸 vs 批大小
@@ -62,10 +65,10 @@ class CFG:
     backbone = 'se_resnext50_32x4d'
     # backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
-    # backbone = 'hrnet_w32'
+    # backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
     # backbone = 'timm-regnety_064'
-    
+    # backbone = 'timm-skresnext50_32x4d'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
@@ -75,13 +78,17 @@ class CFG:
     """
 
     # Expected image height and width divisible by 32.
-    image_size = 1024 # 896/768/512/1024/1280  # 图片大小 
-    input_size = 1024 # 896/768/512/1024/1280  # 输入尺寸
+    image_size = 512 # 896/768/512/1024/1280  # 图片大小 
+    input_size = 512 # 896/768/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 32 # 16 # 训练批量大小
+    train_batch_size = 64 # 96 # 16 # 训练批量大小
+    # train_batch_size = 96 # 96 # 16 # 训练批量大小
+
     valid_batch_size = train_batch_size * 2  # 验证批量大小
-    num_workers = 32 # 2
+
+    num_workers = 24 # 48 # 2
+    # num_workers = 48 # 48 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
     epochs = 8 # 20/40  # 训练轮数
@@ -92,8 +99,9 @@ class CFG:
     # milestones = [7,14] 
 
     # 学习率
-
-    lr =  6e-5 # 6e-7对vit来说太小了，学不到东西
+    # lr =  6e-12 
+    # lr =  6e-10 
+    lr = 6e-8 
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -104,24 +112,24 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_1_loss0.188_score0.717_val_loss0.282_val_score0.639.pt'
-    
-    data_root = '/home/xyli/kaggle'
-    # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    checkpint = ''
+
+    data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
+    # data_root = '/home/xyli/kaggle'
     # data_root = '/root/autodl-tmp'
 
     paths = [
-        # f"{data_root}/train/kidney_1_dense",
-        # f"{data_root}/train/kidney_2",
-        # f"{data_root}/train/kidney_3_sparse",
-        # f"{data_root}/train/kidney_3_dense",
+        f"{data_root}/train/kidney_1_dense",
+        f"{data_root}/train/kidney_2",
+        f"{data_root}/train/kidney_3_sparse",
+        f"{data_root}/train/kidney_3_dense",
 
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
     ]
 
     # 验证集路径
-    # valid_path = f"{data_root}/train/kidney_1_voi"
-    valid_path = f"{data_root}/train/kidney_3_dense"
+    valid_path = f"{data_root}/train/kidney_1_voi"
+    # valid_path = f"{data_root}/train/kidney_3_dense"
     # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
@@ -162,36 +170,57 @@ class CFG:
 
 # ============================ the model ============================
 
-# # 开源的那个0.859模型请不要用修改的Unet
-# # 从老师服务器上下载的模型用这个修改的Unet
 # class Unet(SegmentationModel):
 
 #     def __init__(
 #         self,
-#         encoder_name: str = "maxvit_base_tf_512",
-#         encoder_pretrain = True,
+#         encoder_name: str = "tu-maxvit_base_tf_512",
+#         encoder_depth: int = 5,
+#         encoder_weights: Optional[str] = "imagenet",
 #         decoder_use_batchnorm: bool = True,
 #         decoder_channels: List[int] = (256, 128, 64, 32, 16),
 #         decoder_attention_type: Optional[str] = None,
 #         in_channels: int = 1,
-#         classes: int = 1,
+#         classes: int = 512,
 #         activation: Optional[Union[str, callable]] = None,
 #         aux_params: Optional[dict] = None,
+        
+        
 #     ):
 #         super().__init__()
-#         if encoder_name == "maxvit_base_tf_512":
-#             self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-#             encoder_out_channels = [1,64,96,192,384,768]
-#         self.decoder = UnetDecoder(
-#             encoder_channels= encoder_out_channels,
-#             decoder_channels=decoder_channels,
-#             n_blocks=5,
-#             use_batchnorm=decoder_use_batchnorm,
-#             center=True if encoder_name.startswith("vgg") else False,
-#             attention_type=decoder_attention_type,
+        
+#         self.encoder = get_encoder(
+#             encoder_name,
+#             in_channels=in_channels,
+#             depth=encoder_depth,
+#             weights=encoder_weights,
 #         )
+        
+#         # 默认的encoder接受可变参数 目前这个就是固定参数了
+# #         self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
+#         self.decoder  = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
+# #         self.decoder = UnetDecoder(
+# #             # https://github.com/qubvel/segmentation_models.pytorch/blob/6db76a1106426ac5b55f39fba68168f3bccae7f8/segmentation_models_pytorch/encoders/timm_universal.py#L25
+# # #             """
+# # #             encoder_channels= [
+# # #                 in_channels,
+# # #             ] + self.encoder.feature_info.channels(),
+# # #             """
+# # #             encoder_channels= [1] + [64, 96, 192, 384, 768],
+# # #             encoder_channels= [32, 64,128, 256],
+# # #             encoder_channels=self.encoder.out_channels,
+# #             encoder_channels= [ 1,64,96, 192, 384, 768],
+        
+# #             decoder_channels=decoder_channels,
+# #             n_blocks=encoder_depth,
+            
+# #             use_batchnorm=decoder_use_batchnorm,
+# #             center=True if encoder_name.startswith("vgg") else False,
+# #             attention_type=decoder_attention_type,
+# #         )
+    
 #         self.segmentation_head = SegmentationHead(
-#             in_channels=16,
+#             in_channels=decoder_channels[-1],
 #             out_channels=classes,
 #             activation=activation,
 #             kernel_size=3,
@@ -215,7 +244,7 @@ class CFG:
 #             labels = self.classification_head(features[-1])
 #             return masks, labels
 
-#         return masks   
+#         return masks    
 
 
 class CustomModel(nn.Module):
@@ -231,6 +260,8 @@ class CustomModel(nn.Module):
             activation=None,
         )
 
+        
+
     def forward(self, image):
         # 模型的前向传播
         output = self.model(image)
@@ -241,8 +272,8 @@ class CustomModel(nn.Module):
 # mv /home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth /home/xyli/.cache/torch/hub/checkpoints/
 # mv /home/.cache/torch/checkpoints/se_resnext101_32x4d-3b2fe3d8.pth /root/.cache/torch/hub/checkpoints/se_resnext101_32x4d-3b2fe3d8.pth
 def build_model(weight="imagenet"):
-    # # 加载环境变量
-    # load_dotenv()
+    # 加载环境变量
+    load_dotenv()
 
     # local_weights_path = '/home/xyli/kaggle/kaggle_vasculature/workplace/se_resnext50_32x4d-a260b3a4.pth'
     
@@ -250,8 +281,9 @@ def build_model(weight="imagenet"):
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
-    # # 构建并返回模型
-    # model = CustomModel(CFG, weight)
+    # # # 构建并返回模型
+    # model = CustomModel(CFG, None)
+    # # model = CustomModel(CFG, weight)
 
     # my code
     model = CustomModel(CFG, None)
@@ -752,11 +784,11 @@ if __name__=='__main__':
 
     # =============== define objects ===============
     
-    # # train_x=[kidney1{cut by z}, kidney1{cut by x}, kidney1{cut by y}, ...]
-    # train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
-    # # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
-    # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=True, pin_memory=True)
-    # # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=False, pin_memory=True)
+    # train_x=[kidney1{cut by z}, kidney1{cut by x}, kidney1{cut by y}, ...]
+    train_dataset = Kaggld_Dataset(train_x, train_y, arg=True)
+    # 创建训练数据加载器，设置批大小、工作线程数、是否打乱数据、是否将数据存储在固定内存中
+    train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=True, pin_memory=True)
+    # train_dataset = DataLoader(train_dataset, batch_size=CFG.train_batch_size, num_workers=CFG.num_workers, shuffle=False, pin_memory=True)
 
     # 创建验证数据集对象，使用Kaggld_Dataset类，传入验证数据和标签
     val_dataset = Kaggld_Dataset([val_x], [val_y])
@@ -778,16 +810,16 @@ if __name__=='__main__':
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
     scaler = tc.cuda.amp.GradScaler()
 
-    # # 非常好用，因为有warm-up，对预训练模型有大大的好处
-    # # 使用OneCycleLR策略，单位:epoch
-    # # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
-    # scheduler = tc.optim.lr_scheduler.OneCycleLR(
-    #     optimizer, 
-    #     max_lr=CFG.lr,
-    #     steps_per_epoch=len(train_dataset), 
-    #     epochs=CFG.epochs+1,
-    #     pct_start=0.1
-    # )
+    # 非常好用，因为有warm-up，对预训练模型有大大的好处
+    # 使用OneCycleLR策略，单位:epoch
+    # 刚开始学习率逐步增加，快速收敛；之后学习率逐步减小，进一步收敛；最后继续减少，巩固收敛
+    scheduler = tc.optim.lr_scheduler.OneCycleLR(
+        optimizer, 
+        max_lr=CFG.lr,
+        steps_per_epoch=len(train_dataset), 
+        epochs=CFG.epochs+1,
+        pct_start=0.1
+    )
 
     # # 实践发现，se_resnext50_32x4d同一层级学习率7个epoch后就差不多饱和了
     # # 难以实现warm-up，但如果模型已经具备一定的能力，就无需warm-up了
@@ -800,34 +832,112 @@ if __name__=='__main__':
 
     # =============== define objects ===============
 
+    # =============== start the train ===============
 
+    print("start the train!")
+    best_score = 0.0
+    best_valid = 999.0
+    for epoch in range(CFG.epochs):
 
+        # =============== train ===============
 
-    # =============== validation ===============
+        model.train()
+               
+        losss = 0
+        scores = 0
+        for i, (x, y) in enumerate(train_dataset):
 
-    model.eval()
-    
-    val_losss = 0
-    val_scores = 0
-    
-    for i, (x, y) in enumerate(val_dataset):
-        x = x.cuda().to(tc.float32)
-        y = y.cuda().to(tc.float32)
+            x = x.cuda().to(tc.float32)
+            y = y.cuda().to(tc.float32)
+
+            
+            # 数据预处理
+            x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
+            x = add_noise(x, max_randn_rate=0.5, x_already_normed=True) # 测试过不提分
+            
+            random_number = random.random() # 生成一个0到1之间的随机数
+            target = y
+            input = x
+            if random_number < 0.5:
+                input,targets=cutmix(input,target,0.2)
+                targets[0]=(targets[0]).clone().detach().cuda()
+                targets[1]=(targets[1]).clone().detach().cuda()
+                targets[2]=tc.Tensor([targets[2]]).clone().detach().cuda()
+            else:
+                None
+            # 使用自动混合精度进行前向传播和损失计算
+            with autocast(): # 计算加速，适应一些比较好的GPU
+                output = model(input)
+                loss=None
+                if random_number < 0.5:
+                    loss = cutmix_criterion(output, targets) # 注意这是在CPU上运算的
+                else:
+                    loss = loss_fc(output, target)
+            pred = output
+            
+            # # 使用自动混合精度进行前向传播和损失计算
+            # with autocast(): # 计算加速，适应一些比较好的GPU
+            #     pred = model(x)
+            #     loss = loss_fc(pred, y)
+            
+            # 反向传播和优化
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+
+            optimizer.zero_grad()
+            scheduler.step()
+            
+            # 计算并更新平均损失和分数
+            score = dice_coef(pred.detach(), y) # 感觉这样计算score分普遍偏低了
+            losss = (losss * i + loss.item()) / (i + 1)
+            scores = (scores * i + score) / (i + 1)
+
+            if i == len(train_dataset)-1:
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},epoch:{epoch},loss:{losss:.4f},score:{scores:.4f},lr{optimizer.param_groups[0]['lr']:.4e}")
+            
+            # 释放显存
+            del loss, pred
+
+        # scheduler.step() # 不同的scheduler的优化单位不一样
+
+        # =============== validation ===============
+
+        model.eval()
         
-        # 数据预处理
-        x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
+        val_losss = 0
+        val_scores = 0
         
-        # 使用自动混合精度进行前向传播和损失计算，但不进行梯度计算
-        with autocast():
-            with tc.no_grad():
-                pred = model(x)
-                loss = loss_fc(pred, y)
-        
-        # 计算并更新平均损失和分数
-        score = dice_coef(pred.detach(), y)
-        val_losss = (val_losss * i + loss.item()) / (i + 1)
-        val_scores = (val_scores * i + score) / (i + 1)
-        
-    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
-    print()
+        for i, (x, y) in enumerate(val_dataset):
+            x = x.cuda().to(tc.float32)
+            y = y.cuda().to(tc.float32)
+            
+            # 数据预处理
+            x = norm_with_clip(x.reshape(-1, *x.shape[2:])).reshape(x.shape)
+            
+            # 使用自动混合精度进行前向传播和损失计算，但不进行梯度计算
+            with autocast():
+                with tc.no_grad():
+                    pred = model(x)
+                    loss = loss_fc(pred, y)
+            
+            # 计算并更新平均损失和分数
+            score = dice_coef(pred.detach(), y)
+            val_losss = (val_losss * i + loss.item()) / (i + 1)
+            val_scores = (val_scores * i + score) / (i + 1)
+            
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')},val-->loss:{val_losss:.4f},score:{val_scores:.4f}")
+        print()
 
+
+        # if val_scores > best_score:
+        #     best_score = val_scores
+        #     tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
+        #     # tc.save(model.module.state_dict(), "./best_score.pt")
+            
+        # if val_losss < best_valid:
+        #     best_valid = val_losss
+        #     tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
+        #     # tc.save(model.module.state_dict(), "./best_loss.pt")
+
+        tc.save(model.module.state_dict(), f"./{CFG.backbone}_{epoch}_loss{losss:.3f}_score{scores:.3f}_val_loss{val_losss:.3f}_val_score{val_scores:.3f}.pt")
