@@ -102,7 +102,7 @@ class CFG:
     # 学习率
     # lr =  6e-16
     # lr =  6e-14
-    lr =  6e-12 
+    lr =  6e-20 
     # lr =  6e-10 
     # lr = 6e-8 
     # lr =  6e-7  # 6e-6 # 6e-5  
