@@ -83,7 +83,7 @@ class CFG:
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     # train_batch_size = 32 # 96 # 16 # 训练批量大小
-    train_batch_size = 96 # 96 # 16 # 训练批量大小
+    train_batch_size = 64 # 96 # 16 # 训练批量大小
 
     valid_batch_size = train_batch_size * 2  # 验证批量大小
 
