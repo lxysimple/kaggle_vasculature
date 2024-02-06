@@ -1,6 +1,6 @@
 """
     非CFG内的修改:
-
+        imagenet预训练
 
 """
 
@@ -62,13 +62,13 @@ class CFG:
     # ============== 模型配置 =============
     model_name = 'Unet'
 
-    backbone = 'se_resnext50_32x4d'
+    # backbone = 'se_resnext50_32x4d'
     # backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
     # backbone = 'timm-regnety_064'
-    # backbone = 'timm-skresnext50_32x4d'
+    backbone = 'timm-skresnext50_32x4d'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
@@ -82,7 +82,7 @@ class CFG:
     input_size = 1024 # 896/768/512/1024/1280  # 输入尺寸
 
     # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
-    train_batch_size = 16 # 96 # 16 # 训练批量大小
+    train_batch_size = 32 # 96 # 16 # 训练批量大小
     # train_batch_size = 96 # 96 # 16 # 训练批量大小
 
     valid_batch_size = train_batch_size * 2  # 验证批量大小
@@ -100,36 +100,36 @@ class CFG:
 
     # 学习率
 
-    lr =  6e-7 # 6e-7对vit来说太小了，学不到东西
+    lr =  6e-5 # 6e-7对vit来说太小了，学不到东西
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
     # chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
-    # chopping_percentile = 1e-3  
-    chopping_percentile = (0.0062+0.0022)/2
+    chopping_percentile = 1e-3  
+    # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_0_loss0.186_score0.715_val_loss0.166_val_score0.868.pt'
+    # checkpint = '/home/xyli/kaggle/kaggle_vasculature/se_resnext50_32x4d_0_loss0.186_score0.715_val_loss0.166_val_score0.868.pt'
 
     data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     # data_root = '/home/xyli/kaggle'
     # data_root = '/root/autodl-tmp'
 
     paths = [
-        f"{data_root}/train/kidney_1_dense",
+        # f"{data_root}/train/kidney_1_dense",
         # f"{data_root}/train/kidney_2",
-        # f"{data_root}/train/kidney_3_sparse",
-        f"{data_root}/train/kidney_3_dense",
+        f"{data_root}/train/kidney_3_sparse",
+        # f"{data_root}/train/kidney_3_dense",
 
         # f"{data_root}/train/kidney_1_voi", # 没用，与其他数据集分布相差巨大
     ]
 
     # 验证集路径
     # valid_path = f"{data_root}/train/kidney_1_voi"
-    # valid_path = f"{data_root}/train/kidney_3_dense"
-    valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
+    valid_path = f"{data_root}/train/kidney_3_dense"
+    # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
     # ============== 折数 =============
     valid_id = 1  # 验证集编号
@@ -280,12 +280,12 @@ def build_model(weight="imagenet"):
     print('model_name', CFG.model_name)
     print('backbone', CFG.backbone)
 
-    # # # 构建并返回模型
-    # model = CustomModel(CFG, weight)
+    # # 构建并返回模型
+    model = CustomModel(CFG, weight)
 
-    # my code
-    model = CustomModel(CFG, None)
-    model.load_state_dict(tc.load(CFG.checkpint))
+    # # my code
+    # model = CustomModel(CFG, None)
+    # model.load_state_dict(tc.load(CFG.checkpint))
 
     return model.cuda()
 
