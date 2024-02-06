@@ -63,12 +63,12 @@ class CFG:
     model_name = 'Unet'
 
     # backbone = 'se_resnext50_32x4d'
-    # backbone = 'resnext50_32x4d'
+    backbone = 'resnext50_32x4d'
     # backbone = 'tu-maxvit_base_tf_512'
     # backbone = 'timm-hrnet_w32'
     # backbone = 'mit_b2'
     # backbone = 'timm-regnety_064'
-    backbone = 'timm-skresnext50_32x4d'
+    # backbone = 'timm-skresnext50_32x4d'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
@@ -91,7 +91,7 @@ class CFG:
     num_workers = 48 # 48 # 2
 
     # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
-    epochs = 18 # 20/40  # 训练轮数
+    epochs = 8 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
     # milestones = [10,17] # kidney_1_denses
@@ -100,7 +100,7 @@ class CFG:
 
     # 学习率
 
-    lr =  6e-5 # 6e-7对vit来说太小了，学不到东西
+    lr =  6e-8 # 6e-7对vit来说太小了，学不到东西
     # lr =  6e-7  # 6e-6 # 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
@@ -111,7 +111,7 @@ class CFG:
     # chopping_percentile = (0.0062+0.0022)/2
     # chopping_percentile = 0.012 # kidney_1_voi 舍弃
 
-    checkpint = '/home/xyli/kaggle/kaggle_vasculature/timm-skresnext50_32x4d_0_loss0.987_score0.015_val_loss0.980_val_score0.025.pt'
+    checkpint = '/home/xyli/kaggle/kaggle_vasculature/resnext50_32x4d_7_loss0.167_score0.750_val_loss0.086_val_score0.916.pt'
 
     # data_root = '/home/xyli/kaggle/blood-vessel-segmentation'
     data_root = '/home/xyli/kaggle'
