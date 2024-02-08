@@ -1,4 +1,5 @@
 """ """
+
 # ============================ import libraries ============================
 
 import torch as tc
@@ -45,9 +46,6 @@ from dotenv import load_dotenv
 # ============================ global configure ============================
 
 class CFG:
-    # ============== 预测目标 =============
-
-    target_size = 1
 
     # ============== 模型配置 =============
 
@@ -62,6 +60,7 @@ class CFG:
     # backbone = 'timm-skresnext50_32x4d'
 
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
+    target_size = 1
 
     # ============== 训练配置 =============
 
@@ -121,10 +120,8 @@ class CFG:
     # valid_path = f"{data_root}/train/kidney_3_dense"
     # valid_path = f"{data_root}/train/kidney_2" # kidney_2与test数据分布最像，全数据时用它做验证集
 
-    # ============== 折数 =============
-    valid_id = 1  # 验证集编号
-
     # ============== 数据增强 =============
+
     p_augm = 0.05 #0.5
     # https://blog.csdn.net/zhangyuexiang123/article/details/107705311
     train_aug_list = [
@@ -148,94 +145,17 @@ class CFG:
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     train_aug = A.Compose(train_aug_list)
+
     valid_aug_list = [ 
         # 注意这个不是整张图片，而是在随机裁剪的图片上做验证的
         A.RandomCrop(input_size, input_size, p=1),
-
         # 验证集不需要裁剪，因为Unet输入尺寸固定，但好像要32的倍数
         ToTensorV2(transpose_mask=True),  # 转换为张量
     ]
     valid_aug = A.Compose(valid_aug_list)
 
 # ============================ the model ============================
-
-# class Unet(SegmentationModel):
-
-#     def __init__(
-#         self,
-#         encoder_name: str = "tu-maxvit_base_tf_512",
-#         encoder_depth: int = 5,
-#         encoder_weights: Optional[str] = "imagenet",
-#         decoder_use_batchnorm: bool = True,
-#         decoder_channels: List[int] = (256, 128, 64, 32, 16),
-#         decoder_attention_type: Optional[str] = None,
-#         in_channels: int = 1,
-#         classes: int = 512,
-#         activation: Optional[Union[str, callable]] = None,
-#         aux_params: Optional[dict] = None,
-        
-        
-#     ):
-#         super().__init__()
-        
-#         self.encoder = get_encoder(
-#             encoder_name,
-#             in_channels=in_channels,
-#             depth=encoder_depth,
-#             weights=encoder_weights,
-#         )
-        
-#         # 默认的encoder接受可变参数 目前这个就是固定参数了
-# #         self.encoder = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-#         self.decoder  = timm.create_model('maxvit_base_tf_512', features_only=True, in_chans=in_channels, num_classes=classes)
-# #         self.decoder = UnetDecoder(
-# #             # https://github.com/qubvel/segmentation_models.pytorch/blob/6db76a1106426ac5b55f39fba68168f3bccae7f8/segmentation_models_pytorch/encoders/timm_universal.py#L25
-# # #             """
-# # #             encoder_channels= [
-# # #                 in_channels,
-# # #             ] + self.encoder.feature_info.channels(),
-# # #             """
-# # #             encoder_channels= [1] + [64, 96, 192, 384, 768],
-# # #             encoder_channels= [32, 64,128, 256],
-# # #             encoder_channels=self.encoder.out_channels,
-# #             encoder_channels= [ 1,64,96, 192, 384, 768],
-        
-# #             decoder_channels=decoder_channels,
-# #             n_blocks=encoder_depth,
-            
-# #             use_batchnorm=decoder_use_batchnorm,
-# #             center=True if encoder_name.startswith("vgg") else False,
-# #             attention_type=decoder_attention_type,
-# #         )
     
-#         self.segmentation_head = SegmentationHead(
-#             in_channels=decoder_channels[-1],
-#             out_channels=classes,
-#             activation=activation,
-#             kernel_size=3,
-#         )
-
-#         if aux_params is not None:
-#             self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-#         else:
-#             self.classification_head = None
-
-#         self.name = "u-{}".format(encoder_name)
-#         self.initialize()
-        
-#     def forward(self, x):
-#         features = self.encoder(x)
-#         features.insert(0,x)
-#         decoder_output = self.decoder(*features)
-#         masks = self.segmentation_head(decoder_output)
-
-#         if self.classification_head is not None:
-#             labels = self.classification_head(features[-1])
-#             return masks, labels
-
-#         return masks    
-
-
 class CustomModel(nn.Module):
     def __init__(self, CFG, weight=None):
         super().__init__()
@@ -248,8 +168,6 @@ class CustomModel(nn.Module):
             classes=CFG.target_size,
             activation=None,
         )
-
-        
 
     def forward(self, image):
         # 模型的前向传播
@@ -377,7 +295,8 @@ def add_noise(x: tc.Tensor, max_randn_rate=0.1, randn_rate=None, x_already_norme
     # 添加噪声并返回处理后的张量
     return (x - x_mean + tc.randn(size=x.shape, device=x.device, dtype=x.dtype) * randn_rate * x_std) / cache
 
-# ============================ dataset just for loading ============================
+# ============================ 提前将所有数据读入内存 ============================
+
 def to_size(img , image_size = 1024):
     if image_size > img.shape[1]:
        img = np.rot90(img)
@@ -433,9 +352,7 @@ class Data_loader(Dataset):
             img = img.to(tc.uint8)
 
         return img  # 返回处理后的图像
-
-# ============================ the model ============================
-    
+   
 def load_data(paths, is_label=False):
     """ 用空间换时间 """
 
@@ -487,7 +404,7 @@ def load_data(paths, is_label=False):
     
     return x # 返回处理后的数据张量
 
-# ============================ validation metric ============================
+# ============================ 评价指标 ============================
 
 #https://www.kaggle.com/code/kashiwaba/sennet-hoa-train-unet-simple-baseline
 def dice_coef(y_pred: tc.Tensor, y_true: tc.Tensor, thr=0.5, dim=(-1, -2), epsilon=0.001):
@@ -512,8 +429,6 @@ def dice_coef(y_pred: tc.Tensor, y_true: tc.Tensor, thr=0.5, dim=(-1, -2), epsil
     # 返回Dice系数作为评估指标
     return dice
 
-# ============================ train loss ============================
-
 class DiceLoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(DiceLoss, self).__init__()
@@ -536,7 +451,7 @@ class DiceLoss(nn.Module):
         # 返回 Dice 损失
         return 1 - dice
     
-# ============================ train loss ============================
+# ============================ Dataset ============================
     
 class Kaggld_Dataset(Dataset):
     def __init__(self, x: list, y: list, arg: bool = False):
@@ -556,7 +471,6 @@ class Kaggld_Dataset(Dataset):
         return sum([y.shape[0] - self.in_chans for y in self.y])
 
     def __getitem__(self, index):
-
         # 某个数据集末尾的图片数凑不齐in_chans个的话，就从下一个数据集开始
         # 感觉这个算法有点问题，另外不如把所有数据融到一起简单易懂
         i = 0
@@ -582,7 +496,6 @@ class Kaggld_Dataset(Dataset):
         x = x[index:index + self.in_chans, :, :]
         y = y[index + self.in_chans // 2, :, :]
 
-
         # 我感觉是为了与其他图像处理库或工具兼容，因为一些库（如 Matplotlib）期望图像的通道表示是 (H, W, C) 的形式
         data = self.transform(image=x.numpy().transpose(1, 2, 0), mask=y.numpy())
         x = data['image']
@@ -602,7 +515,6 @@ class Kaggld_Dataset(Dataset):
 
 # =============== Cutmix, Mixup, and It's Loss Function ===============
     
-
 # size是图片的shape，即（b,c,w,h）
 # lam 参数的作用是调整融合区域的大小，lam 越接近 1，融合框越小，融合程度越低
 # 返回一个随机生成的矩形框，用于确定两张图像的融合区域
@@ -635,7 +547,6 @@ def cutmix(data, targets1, alpha):
     shuffled_data = data[indices] # 这是打乱b后的数据,shape=(b,c,w,h)
     shuffled_targets1 = targets1[indices] # 同上shape=(b,)
 
-    
     # 基于 alpha 随机生成 lambda 值，它控制了两个图像的融合程度
     lam = np.random.beta(alpha, alpha)
     
@@ -679,8 +590,6 @@ def mixup_criterion(preds1, targets):
     criterion = DiceLoss()
     return lam * criterion(preds1, targets1) + (1 - lam) * criterion(preds1, targets2) 
 
-
-
 # ============================ the main ============================
 
 if __name__=='__main__':
@@ -691,7 +600,7 @@ if __name__=='__main__':
     tc.backends.cudnn.enabled = True
     tc.backends.cudnn.benchmark = True
  
-    # =============== data path ===============
+    # =============== 加载数据 ===============
 
     train_x = [] # train_x=[[all pic of kidney_1_dense], [all pic of kidney_1_voi], ...]
     train_y = [] # is the corresponding mask
@@ -720,13 +629,6 @@ if __name__=='__main__':
             train_x.append(x)
             train_y.append(y)
 
-        # # 排除特定路径, but I think it will not be run.
-        # if path == f"{CFG.data_root}/train/kidney_3_dense":    
-        #     continue
-        
-        # # 每次加载一个数据集，也是一个3D肾
-        # # 这里90%已经被自动排序了
-        # x = load_data(glob(f"{path}/images/*"), is_label=False)
         print(path)
         print("train dataset x shape:", x.shape)
         
@@ -756,10 +658,6 @@ if __name__=='__main__':
     else: # 当验证集是其他
         paths_x = [x.replace("labels", "images") for x in paths_y]
 
-    # =============== data path ===============
-
-    # =============== load the data ===============
-
     # 加载验证集图像和标签数据
     print()
     print(CFG.valid_path)
@@ -768,8 +666,6 @@ if __name__=='__main__':
     val_y = load_data(paths_y, is_label=True)
     print("validate dataset y shape:", val_y.shape)	
     print()
-
-    # =============== load the data ===============
 
     # =============== define objects ===============
     
@@ -795,7 +691,6 @@ if __name__=='__main__':
     # 使用AdamW优化器，传入模型参数和学习率
     optimizer = tc.optim.AdamW(model.parameters(), lr=CFG.lr)
 
-
     # 使用GradScaler进行梯度缩放，用于混合精度训练 2080 3090 / 1080ti
     scaler = tc.cuda.amp.GradScaler()
 
@@ -818,8 +713,6 @@ if __name__=='__main__':
     #     gamma=0.1,
     #     last_epoch=-1
     # )
-
-    # =============== define objects ===============
 
     # =============== start the train ===============
 
