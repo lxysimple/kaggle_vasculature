@@ -1,10 +1,3 @@
-"""
-    非CFG内的修改 或 CFG内要注意点:
-        checkpoint路径会变化
-
-
-"""
-
 
 # ============================ import libraries ============================
 
@@ -50,17 +43,12 @@ import random
 from dotenv import load_dotenv
 # ============================ global configure ============================
 
-# 显存： 骨干网络的复杂度 vs 输入尺寸 vs 批大小
-# 【理想情况】：模型输入1024 * 1024，1500 * 1500
-
-# 前20 epoch 512 * 512  训练模型
-# 后20 epoch 1024 * 1024 继续训练
-
 class CFG:
     # ============== 预测目标 =============
     target_size = 1
 
     # ============== 模型配置 =============
+
     model_name = 'Unet'
 
     # backbone = 'se_resnext50_32x4d'
@@ -74,9 +62,6 @@ class CFG:
     in_chans = 1 # 1/5  # 输入通道数, 我感觉是5张图片看做一个样本
 
     # ============== 训练配置 =============
-    """
-    要被128整除
-    """
 
     # Expected image height and width divisible by 32.
     image_size = 1024 # 896/768/512/1024/1280  # 图片大小 
@@ -95,16 +80,17 @@ class CFG:
     epochs = 8 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
-    # milestones = [10,17] # kidney_1_denses
-    # milestones = [4,8] # kidney_1_denses
+    # milestones = [10,17] 
+    # milestones = [4,8] 
     # milestones = [7,14] 
 
     # 学习率
-
     lr =  6e-12 
-    # lr =  6e-10 
+    # lr = 6e-10 
     # lr = 6e-8 
-    # lr =  6e-7  # 6e-6 # 6e-5  
+    # lr = 6e-7  
+    # lr = 6e-6 
+    # lr = 6e-5  
 
     # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
     # chopping_percentile = 0.0041  # kidney_2
