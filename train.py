@@ -1,4 +1,4 @@
-
+""" """
 # ============================ import libraries ============================
 
 import torch as tc
@@ -41,10 +41,12 @@ import random
 
 # Importing load_dotenv for loading environment variables
 from dotenv import load_dotenv
+
 # ============================ global configure ============================
 
 class CFG:
     # ============== 预测目标 =============
+
     target_size = 1
 
     # ============== 模型配置 =============
@@ -67,7 +69,6 @@ class CFG:
     image_size = 1024 # 896/768/512/1024/1280  # 图片大小 
     input_size = 1024 # 896/768/512/1024/1280  # 输入尺寸
 
-    # input_size=1920, in_chans=5, 1-GPU-max—memory's batch=3, 2.35G/2.45G, 95% 
     # train_batch_size = 32 # 96 # 16 # 训练批量大小
     train_batch_size = 96 # 96 # 16 # 训练批量大小
 
@@ -76,7 +77,7 @@ class CFG:
     # num_workers = 24 # 48 # 2
     num_workers = 48 # 48 # 2
 
-    # 同一阶段学习率7个epoch后必然过拟合，无论什么模型，往往第6个epoch是最优的
+    # 6e-5下7个epoch往往就学到极限了
     epochs = 8 # 20/40  # 训练轮数
 
     # milestones = [6,10] 
@@ -92,7 +93,7 @@ class CFG:
     # lr = 6e-6 
     # lr = 6e-5  
 
-    # chopping_percentile = 0.0062  # kidney_1_denses(感觉学习率调小点还有潜力)
+    # chopping_percentile = 0.0062  # kidney_1_denses
     # chopping_percentile = 0.0041  # kidney_2
     # chopping_percentile = 0.0027  # kidney_3_sparse
     # chopping_percentile = 0.0022  # kidney_3_dense
