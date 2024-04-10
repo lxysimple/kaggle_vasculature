@@ -515,9 +515,7 @@ class Kaggld_Dataset(Dataset):
 
 # =============== Cutmix, Mixup, and It's Loss Function ===============
     
-# size是图片的shape，即（b,c,w,h）
-# lam 参数的作用是调整融合区域的大小，lam 越接近 1，融合框越小，融合程度越低
-# 返回一个随机生成的矩形框，用于确定两张图像的融合区域
+
 def rand_bbox(size, lam):
     W = size[2]
     H = size[3]
@@ -536,49 +534,39 @@ def rand_bbox(size, lam):
 
     return bbx1, bby1, bbx2, bby2
 
-# data:(b,c,w,h)
-# targets1~3:(b,),说明每张图中有3类目标
-# alpha,两张图片融合区域的大小
-# 返回这b个图随机两两融合的结果data:(b,c,w,h),和融合结果的标签
-# 我感觉融合结果的标签类别1应该是(targets1 + shuffled_targets1),类别2、3同理
-def cutmix(data, targets1, alpha):
-    # 对b这个维度进行随机打乱,产生随机序列indices
-    indices = tc.randperm(data.size(0))
-    shuffled_data = data[indices] # 这是打乱b后的数据,shape=(b,c,w,h)
-    shuffled_targets1 = targets1[indices] # 同上shape=(b,)
 
-    # 基于 alpha 随机生成 lambda 值，它控制了两个图像的融合程度
+def cutmix(data, targets1, alpha):
+
+    indices = tc.randperm(data.size(0))
+    shuffled_data = data[indices] 
+    shuffled_targets1 = targets1[indices]
+
+
     lam = np.random.beta(alpha, alpha)
     
-    # 随机生成一个矩形框 (bbx1, bby1) 和 (bbx2, bby2)，用于融合两张图像的区域
+
     bbx1, bby1, bbx2, bby2 = rand_bbox(data.size(), lam)
     
-    # 使用另一张图像的相应区域替换第一张图像的相应区域，实现图像融合
+
     data[:, :, bbx1:bbx2, bby1:bby2] = data[indices, :, bbx1:bbx2, bby1:bby2]
     
-    # adjust lambda to exactly match pixel ratio
-    # λ = 1 - (融合区域的像素数量 / 总图像像素数量)
-    # 基于现实对已给的λ进行一个调整
+
     lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (data.size()[-1] * data.size()[-2]))
 
     targets = [targets1, shuffled_targets1, lam]
     return data, targets
 
-# 我感觉输入参数和输出参数含义同上
 def mixup(data, targets1, alpha):
     indices = tc.randperm(data.size(0))
     shuffled_data = data[indices]
     shuffled_targets1 = targets1[indices]
 
     lam = np.random.beta(alpha, alpha)
-    data = data * lam + shuffled_data * (1 - lam) # 我感觉是对于每个像素点都做该算法
+    data = data * lam + shuffled_data * (1 - lam) 
     targets = [targets1, shuffled_targets1, lam]
 
     return data, targets
 
-# 被我猜中了，这里是1张图3个目标，因为经过cutmix，每个目标变得半人半马，于是求每个目标loss时需要用到2个标签，最后该图片的总loss是3个目标的loss和
-# preds1~3是预测出图中3个目标，对其softmax的概率向量
-# targets中有6个标签，其中2个为1组，代表一个目标的类别，最后一个是lam，代表cutmix的程度，求loss时可做半人半马的权重
 def cutmix_criterion(preds1, targets):
     targets1, targets2, lam = targets[0], targets[1], targets[2]
     criterion = DiceLoss()
